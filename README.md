@@ -43,8 +43,7 @@ et enfin :
 
 ### Dépendences
 
-###### A compléter avec la/les dépendences.
-
+- ros-eloquent-vision-opencv
 
 ### Démarrer la simulation
 
@@ -54,7 +53,10 @@ Pour démarrer la simulation (le court de tennis) :
 ```
 ros2 launch tennis_court tennis_court.launch.py
 ```
-
+Pour démarrer la detection de balles :
+```
+ros2 run detection_balles listener
+```
 
 ## Groupe
 
