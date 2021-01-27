@@ -2,6 +2,42 @@
 
 Ceci est un template de dépôt Git pour le cours d'ingénierie système et modélisation robotique à l'ENSTA Bretagne en 2021.
 
+## Installation
+
+#### Pour installer, cloner le git dans un workspace ROS (ici wk_ros_tennis):
+
+```
+cd src
+git clone https://github.com/{User}/TennisBallCollector.git
+
+```
+
+Ensuite, compilation :
+```
+colcon build --symlink-install
+
+```
+
+#### Modification du bashrc :
+
+```
+gedit ~/.bashrc
+```
+Et ajouter la ligne :
+```
+source /home/{User}/wk_ros_tennis/install/setup.bash
+```
+
+Puis relancer la console ou 
+```
+bash
+```
+
+et enfin : 
+```
+. install/setup.bash
+```
+
 
 ## Lancer la simulation
 
@@ -12,9 +48,11 @@ Ceci est un template de dépôt Git pour le cours d'ingénierie système et mod�
 
 ### Démarrer la simulation
 
-###### A compléter avec la/les commande(s) à lancer.
-```bash
-# TODO
+
+
+Pour démarrer la simulation (le court de tennis) : 
+```
+ros2 launch tennis_court tennis_court.launch.py
 ```
 
 
@@ -22,7 +60,11 @@ Ceci est un template de dépôt Git pour le cours d'ingénierie système et mod�
 
 ### Membres
 
-###### A compléter avec les membres du groupe.
+- Agathe (archetag)
+- Alexandre (EdouardSaladier)
+- Bertrand (Bentur)
+- Kévin (affraike)
+- Robin (RSCZ)
 
 
 ### Gestion de projet
@@ -38,7 +80,7 @@ Ce dépôt doit être cloné dans le dossier `src` d'un workspace ROS 2.
 ### Package `tennis_court`
 
 Le dossier `tennis_court` est un package ROS contenant le monde dans lequel le robot ramasseur de balle devra évoluer ainsi qu'un script permettant de faire apparaître des balles dans la simulation.
-Ce package ne doit pas être modifié.
+Ce package ne doit pas être modifié (sauf pour l'histoire de l'ombre).
 Consulter le [README](tennis_court/README.md) du package pour plus d'informations.
 
 
