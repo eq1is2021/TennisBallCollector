@@ -60,11 +60,11 @@ ros2 launch tennis_court tennis_court.launch.py
 
 ### Membres
 
-#### Agathe (archetag)
-#### Alexandre (EdouardSaladier)
-#### Bertrand (Bentur)
-#### Kévin (affraike)
-#### Robin (RSCZ)
+- Agathe (archetag)
+- Alexandre (EdouardSaladier)
+- Bertrand (Bentur)
+- Kévin (affraike)
+* Robin (RSCZ)
 
 
 ### Gestion de projet
