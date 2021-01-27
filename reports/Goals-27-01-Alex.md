@@ -1,14 +1,14 @@
 # Objectifs du 27/01/2021
 
-PO: Alexandre Evain
+PO: Alexandre
 
 ## Fonctionnalités attendues
 
-* Création d'un robot - Robin Sanchez
-* Commande du robot: aller chercher une balle - Alexandre Evain
-* Utilisation de la caméra globale pour détection des balles - Kevin Affraix
-* Tracking des balles - Bertrand Turck
-* Localisation robot à partir d'un ARUCO - Agathe Archer
+* Création d'un robot - Robin
+* Commande du robot: aller chercher une balle - Alexandre
+* Utilisation de la caméra globale pour détection des balles - Kevin
+* Tracking des balles - Bertrand
+* Localisation robot à partir d'un ARUCO - Agathe
 
 ## Tâches à réaliser
 
