@@ -4,7 +4,7 @@ Ceci est un template de dépôt Git pour le cours d'ingénierie système et mod�
 
 ## Installation
 
-####Pour installer, cloner le git dans un workspace ROS (ici wk_ros_tennis):
+#### Pour installer, cloner le git dans un workspace ROS (ici wk_ros_tennis):
 
 ```
 cd src
@@ -18,7 +18,7 @@ colcon build --symlink-install
 
 ```
 
-####Modification du bashrc :
+#### Modification du bashrc :
 
 ```
 gedit ~/.bashrc
