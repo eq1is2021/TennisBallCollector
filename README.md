@@ -64,7 +64,7 @@ ros2 launch tennis_court tennis_court.launch.py
 - Alexandre (EdouardSaladier)
 - Bertrand (Bentur)
 - Kévin (affraike)
-* Robin (RSCZ)
+- Robin (RSCZ)
 
 
 ### Gestion de projet
