@@ -55,7 +55,7 @@ ros2 launch tennis_court tennis_court.launch.py
 ```
 Pour démarrer la detection de balles :
 ```
-ros2 run detection_balles listener
+ros2 run detection_balles detection_balles
 ```
 
 ## Groupe
