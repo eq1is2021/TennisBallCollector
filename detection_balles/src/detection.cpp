@@ -137,6 +137,7 @@ class DetectionBalles : public rclcpp::Node
 				geometry_msgs::msg::Pose p;
 				p.position.x = centers[i].x;
 				p.position.y = centers[i].y;
+				p.position.z = 0.;
 				posearray.poses.push_back(p);
 			}
 			//imshow("Entrée",I);
