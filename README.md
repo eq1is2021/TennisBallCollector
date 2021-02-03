@@ -58,6 +58,13 @@ Pour démarrer la detection de balles :
 ros2 run detection_balles detection_balles
 ```
 
+Pour démarrer la labelisation des balles : 
+
+```
+ros2 run labelisation_balles labelisation
+
+```
+
 ## Groupe
 
 ### Membres
