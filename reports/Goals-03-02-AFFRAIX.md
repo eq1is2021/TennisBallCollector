@@ -1,6 +1,6 @@
-# Objectifs du 27/01/2021
+# Objectifs du 03/02/2021
 
-PO: Alexandre
+PO: Kévin AFFRAIX
 
 ## Fonctionnalités attendues
 
@@ -14,7 +14,7 @@ PO: Alexandre
 
 * Finalisation du robot, implémentation du controlleur attrapeur de balles
 * Concevoir une première commande simple du robot
-* Passage d'un simple litener à un publisher (détection de balles)
+* Passage d'un simple listener à un publisher (détection de balles)
 * Recherche de solutions de tracking / segmentation et implémentation d'une première solution
 * Exploiter les ARUCO pour detecter la position du robot
 
