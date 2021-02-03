@@ -65,6 +65,13 @@ ros2 run labelisation_balles labelisation
 
 ```
 
+Pour démarrer la localisation des arucos :
+
+```
+ros2 run localisation_aruco viewer
+
+```
+
 ## Groupe
 
 ### Membres
