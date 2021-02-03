@@ -81,6 +81,18 @@ def test_goal_zone(pos_robot):
     else:
         return False
 
+def test_goal(pos_robot):
+    x_diff_left=goal_left_x[0]-pos_robot[0]
+    y_diff_left=goal_left_y[1]-pos_robot[1]
+    dist_left=np.linalg.norm([x_diff_left, y_diff_left])
+    x_diff_right=goal_right_x[0]-pos_robot[0]
+    y_diff_right=goal_right_y[1]-pos_robot[1]
+    dist_right=np.linalg.norm([x_diff_right, y_diff_right])
+    if dist_left < 1 or dist_right < 1:
+        return True
+    else:
+        return False
+
 #Fonction de test pour voir si une balle est proche du robot par rapport à la disrance d - et si elle se trouve du même côté que le robot lui même
 def test_ball_near(pos_robot,pos_balle,d):
     x_diff=pos_balle[0]-pos_robot[0]
@@ -123,7 +135,7 @@ class Robot_Control(Node):
 
         self.subscription = self.create_subscription(
             Twist,
-            'robot_position',
+            'aruco_twist',
             self.robot_position_callback,
             10)
 
@@ -208,39 +220,51 @@ class Robot_Control(Node):
             if not self.has_objective:
                 # S'il est à gauche
                 if loc_robot(self.pos_robot[0]) == "left":
-                    if test_goal_zone(self.pos_robot) or self.goal_status: # S'il est dans la zone d'entrée du but, ou s'il est en train d'aller vers le but, il va vers le but
-                        self.objective_x,self.objective_y = goal_left_x,goal_left_y
-                        self.goal_status = True
+                    if test_goal(self.pos_robot):
+                        self.objective_x,self.objective_y = 0,0
                         self.has_objective = True
-                    else: #Sinon, il se dirige vers la zone d'entrée de but
-                        self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
-                        self.has_objective = True
-                else:
-                    # Si on teste 
-                    if test_goal_zone(self.pos_robot) or self.goal_status:
-                        self.objective_x,self.objective_y = goal_right_x,goal_right_y
-                        self.has_objective = True
-                        self.goal_status = True
                     else:
-                        self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
+                        if test_goal_zone(self.pos_robot) or self.goal_status: # S'il est dans la zone d'entrée du but, ou s'il est en train d'aller vers le but, il va vers le but
+                            self.objective_x,self.objective_y = goal_left_x,goal_left_y
+                            self.goal_status = True
+                            self.has_objective = True
+                        else: #Sinon, il se dirige vers la zone d'entrée de but
+                            self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
+                            self.has_objective = True
+                else:
+                    if test_goal(self.pos_robot):
+                        self.objective_x,self.objective_y = 0,0
                         self.has_objective = True
+                    else:
+                        if test_goal_zone(self.pos_robot) or self.goal_status:
+                            self.objective_x,self.objective_y = goal_right_x,goal_right_y
+                            self.has_objective = True
+                            self.goal_status = True
+                        else:
+                            self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
+                            self.has_objective = True
         else:
             # Si le robot n'a pas de balle, il ne doit pas aller vers le but de toute façon.
             self.goal_status = False
-            # Si il y a des balles qui existent
-            if self.num_balle > 0:
-                if self.balle_target_id == -1:
-                    # On prends la balle avec le poids le plus élevé
-                    self.balle_target_id=get_ball_target_id(self)
-                # Si le robot et la balle sont du même côté:
-                if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id,0]):
-                    self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id,0],self.pos_balle[self.balle_target_id,1]
-                    self.has_objective = True
-                    # Le robot va chercher la balle
+            if test_goal(self.pos_robot):
+                if loc_robot(self.pos_robot[0]) == "left":
+                    self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
                 else:
-                    # Sinon, le robot va vers le passage dans le mur le plus proche
-                    self.objective_x,self.objective_y=get_passage_wall(self.pos_robot)
-                    self.has_objective = True
+                    self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
+            else:
+                if self.num_balle > 0:
+                    if self.balle_target_id == -1:
+                        # On prends la balle avec le poids le plus élevé
+                        self.balle_target_id=get_ball_target_id(self)
+                    # Si le robot et la balle sont du même côté:
+                    if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id,0]):
+                        self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id,0],self.pos_balle[self.balle_target_id,1]
+                        self.has_objective = True
+                        # Le robot va chercher la balle
+                    else:
+                        # Sinon, le robot va vers le passage dans le mur le plus proche
+                        self.objective_x,self.objective_y=get_passage_wall(self.pos_robot)
+                        self.has_objective = True
         # Enfin, on envoie la commande du robot
         self.commande_robot=command_objective(self.pos_robot,[self.objective_x,self.objective_y])
 
