@@ -5,6 +5,8 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
+
 #include "sensor_msgs/msg/image.hpp"
 #include "std_msgs/msg/header.hpp"
 
@@ -41,14 +43,15 @@ void Dilation( Mat Min, Mat Mout, int dilation_type, int dilation_size, int dept
     }
 }
 
-class MinimalSubscriber : public rclcpp::Node
+class DetectionBalles : public rclcpp::Node
 {
   public:
-    MinimalSubscriber()
-    : Node("minimal_subscriber")
+    DetectionBalles()
+    : Node("node_detection")
     {
-      subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-      "/zenith_camera/image_raw", 10, std::bind(&MinimalSubscriber::image_callback, this, _1));
+    	publisher_ = this->create_publisher<geometry_msgs::msg::PoseArray>("balles_coords", 10);
+      	subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
+      	"/zenith_camera/image_raw", 10, std::bind(&DetectionBalles::image_callback, this, _1));
     }
 
   private:
@@ -57,6 +60,9 @@ class MinimalSubscriber : public rclcpp::Node
 		std_msgs::msg::Header msg_header = msg->header;
 		std::string frame_id = msg_header.frame_id.c_str();
 		//RCLCPP_INFO(this->get_logger(), "New Image from %s", frame_id);
+
+		geometry_msgs::msg::PoseArray posearray;
+		posearray.header.frame_id = "root_link";
 
 		cv_bridge::CvImagePtr cv_ptr;
 		try
@@ -73,7 +79,7 @@ class MinimalSubscriber : public rclcpp::Node
 			inRange(hsv, min, max,mask);
 			bitwise_and(hsv,hsv,res,mask);
 			cvtColor(res,res,COLOR_HSV2BGR);
-			imshow("res",res);
+			//imshow("res",res);
 			// --------------------------
 			// Lissage de l'image
 			// --------------------------
@@ -100,7 +106,7 @@ class MinimalSubscriber : public rclcpp::Node
 			// --------------------------
 			// Deuxième lissage de la balle pour retrouver au maximum la rondeur.
 			// --------------------------
-			imshow("res2",res_filtered);
+			//imshow("res2",res_filtered);
 			Mat res_dilated = res_filtered.clone();
 			//Dilation(res_dilated, res_dilated, MORPH_ELLIPSE, 3, 1);
 			//Erosion(res_dilated, res_dilated, MORPH_ELLIPSE, 1, 1);
@@ -127,9 +133,15 @@ class MinimalSubscriber : public rclcpp::Node
 			}
 
 			for (int i = 0; i < centers.size(); i++){
-				circle( I, centers[i], (int)radius[i], 0, 2 );
+				//circle( I, centers[i], (int)radius[i], 0, 2 );
+				geometry_msgs::msg::Pose p;
+				p.position.x = centers[i].x;
+				p.position.y = centers[i].y;
+				p.position.z = 0.;
+				posearray.poses.push_back(p);
 			}
-			imshow("Entrée",I);
+			//imshow("Entrée",I);
+			publisher_->publish(posearray);
 			waitKey(3);
 
 		}
@@ -140,12 +152,13 @@ class MinimalSubscriber : public rclcpp::Node
     	}
     }
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
+    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr publisher_;
 };
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<MinimalSubscriber>());
+  rclcpp::spin(std::make_shared<DetectionBalles>());
   rclcpp::shutdown();
   return 0;
 }

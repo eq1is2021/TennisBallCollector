@@ -38,12 +38,12 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_executable(listener src/detection.cpp)
-ament_target_dependencies(listener rclcpp std_msgs geometry_msgs sensor_msgs OpenCV cv_bridge)
+add_executable(detection_balles src/detection.cpp)
+ament_target_dependencies(detection_balles rclcpp std_msgs geometry_msgs sensor_msgs OpenCV cv_bridge)
 
 
 install(TARGETS
-  listener
+  detection_balles
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
