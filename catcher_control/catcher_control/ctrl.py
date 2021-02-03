@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
 
@@ -7,16 +8,13 @@ from geometry_msgs.msg import Wrench
 class WrenchSubPub(Node):
 
     def __init__(self):
-        super().__init__('Wrench_pub')
+        super().__init__('wrench_pub')
         self.isUp = True
         self.publisher_ = self.create_publisher(Wrench, '/catcher_force', 10)
         timer_period = 0.1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
-
         self.subscription = self.create_subscription(Bool,'/catcher_up', self.listener_callback,10)
-        self.subscription  # prevent unused variable warning
-
 
     def listener_callback(self, msg):
         self.isUp = msg.data
