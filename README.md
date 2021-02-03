@@ -53,6 +53,12 @@ Pour démarrer la simulation (le court de tennis) :
 ```
 ros2 launch tennis_court tennis_court.launch.py
 ```
+```
+ros2 launch tennis_court launcher.launch.py
+```
+
+
+
 Pour démarrer la detection de balles :
 ```
 ros2 run detection_balles detection_balles

@@ -2,6 +2,13 @@
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot_1">
 
+  <material name="White">
+    <color rgba="1.0 1.0 1.0 1.0"/>
+  </material>
+  <material name="Black">
+    <color rgba="0.1 0.1 0.1 1.0"/>
+  </material>
+
   <xacro:macro name="cylinder_inertia" params="m r h">
     <inertia  ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0" iyy="${m*(3*r*r+h*h)/12}" iyz = "0" izz="${m*r*r/2}" /> 
   </xacro:macro>
@@ -13,6 +20,144 @@
   <xacro:macro name="sphere_inertia" params="m r">
     <inertia  ixx="${2/3*m*r*r}" ixy = "0" ixz = "0" iyy="${2/3*m*r*r}" iyz = "0" izz="${2/3*m*r*r}" /> 
   </xacro:macro>
+
+
+  <xacro:macro name="sub_aruco_black" params="name x y z l h m">
+    <link name="${name}">
+      <visual>
+        <geometry>
+          <box size="${l} ${l} ${h}"/>
+        </geometry>
+        <origin xyz="${x} ${y} ${z}"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${l} ${l} ${h}"/>
+        </geometry>
+        <origin xyz="${x} ${y} ${z}"/>
+      </collision>
+    <inertial>
+      <mass value="${m}"/>
+      <xacro:box_inertia m="${m}" x="${l}" y="${l}" z="${h}" />
+      <origin xyz="${x} ${y} ${z}"/>
+    </inertial>
+    </link>
+    <gazebo reference="${name}">
+      <material>Gazebo/Black</material>
+    </gazebo>
+  </xacro:macro>
+  <xacro:macro name="sub_aruco_white" params="name x y z l h m">
+    <link name="${name}">
+      <visual>
+        <geometry>
+          <box size="${l} ${l} ${h}"/>
+        </geometry>
+        <origin xyz="${x} ${y} ${z}"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${l} ${l} ${h}"/>
+        </geometry>
+        <origin xyz="${x} ${y} ${z}"/>
+      </collision>
+    <inertial>
+      <mass value="${m}"/>
+      <xacro:box_inertia m="${m}" x="${l}" y="${l}" z="${h}" />
+      <origin xyz="${x} ${y} ${z}"/>
+    </inertial>
+    </link>
+    <gazebo reference="${name}">
+      <material>Gazebo/White</material>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="aruco" params="name x y z l h m">
+    <xacro:sub_aruco_black name="${name}_11" x="${x-5*l/24}" y="${y-5*l/24}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_12" x="${x-5*l/24}" y="${y-5*l/24+1*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_13" x="${x-5*l/24}" y="${y-5*l/24+2*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_14" x="${x-5*l/24}" y="${y-5*l/24+3*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_15" x="${x-5*l/24}" y="${y-5*l/24+4*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_16" x="${x-5*l/24}" y="${y-5*l/24+5*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+
+    <xacro:sub_aruco_black name="${name}_21" x="${x-5*l/24+1*l/12}" y="${y-5*l/24}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_white name="${name}_22" x="${x-5*l/24+1*l/12}" y="${y-5*l/24+1*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_23" x="${x-5*l/24+1*l/12}" y="${y-5*l/24+2*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_white name="${name}_24" x="${x-5*l/24+1*l/12}" y="${y-5*l/24+3*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_white name="${name}_25" x="${x-5*l/24+1*l/12}" y="${y-5*l/24+4*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_26" x="${x-5*l/24+1*l/12}" y="${y-5*l/24+5*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+
+    <xacro:sub_aruco_black name="${name}_31" x="${x-5*l/24+2*l/12}" y="${y-5*l/24}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_32" x="${x-5*l/24+2*l/12}" y="${y-5*l/24+1*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_white name="${name}_33" x="${x-5*l/24+2*l/12}" y="${y-5*l/24+2*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_34" x="${x-5*l/24+2*l/12}" y="${y-5*l/24+3*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_white name="${name}_35" x="${x-5*l/24+2*l/12}" y="${y-5*l/24+4*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_36" x="${x-5*l/24+2*l/12}" y="${y-5*l/24+5*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+
+    <xacro:sub_aruco_black name="${name}_41" x="${x-5*l/24+3*l/12}" y="${y-5*l/24}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_42" x="${x-5*l/24+3*l/12}" y="${y-5*l/24+1*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_43" x="${x-5*l/24+3*l/12}" y="${y-5*l/24+2*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_white name="${name}_44" x="${x-5*l/24+3*l/12}" y="${y-5*l/24+3*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_white name="${name}_45" x="${x-5*l/24+3*l/12}" y="${y-5*l/24+4*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_46" x="${x-5*l/24+3*l/12}" y="${y-5*l/24+5*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+
+    <xacro:sub_aruco_black name="${name}_51" x="${x-5*l/24+4*l/12}" y="${y-5*l/24}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_52" x="${x-5*l/24+4*l/12}" y="${y-5*l/24+1*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_53" x="${x-5*l/24+4*l/12}" y="${y-5*l/24+2*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_white name="${name}_54" x="${x-5*l/24+4*l/12}" y="${y-5*l/24+3*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_55" x="${x-5*l/24+4*l/12}" y="${y-5*l/24+4*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_56" x="${x-5*l/24+4*l/12}" y="${y-5*l/24+5*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+
+    <xacro:sub_aruco_black name="${name}_61" x="${x-5*l/24+5*l/12}" y="${y-5*l/24}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_62" x="${x-5*l/24+5*l/12}" y="${y-5*l/24+1*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_63" x="${x-5*l/24+5*l/12}" y="${y-5*l/24+2*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_64" x="${x-5*l/24+5*l/12}" y="${y-5*l/24+3*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_65" x="${x-5*l/24+5*l/12}" y="${y-5*l/24+4*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+    <xacro:sub_aruco_black name="${name}_66" x="${x-5*l/24+5*l/12}" y="${y-5*l/24+5*l/12}" z="${z}" l="${l/12}" h="${h}" m="${m}" />
+
+    <xacro:fixed_joint elem1="${name}_11" elem2="${name}_12" />
+    <xacro:fixed_joint elem1="${name}_12" elem2="${name}_13" />
+    <xacro:fixed_joint elem1="${name}_13" elem2="${name}_14" />
+    <xacro:fixed_joint elem1="${name}_14" elem2="${name}_15" />
+    <xacro:fixed_joint elem1="${name}_15" elem2="${name}_16" />
+
+    <xacro:fixed_joint elem1="${name}_16" elem2="${name}_21" />
+    <xacro:fixed_joint elem1="${name}_21" elem2="${name}_22" />
+    <xacro:fixed_joint elem1="${name}_22" elem2="${name}_23" />
+    <xacro:fixed_joint elem1="${name}_23" elem2="${name}_24" />
+    <xacro:fixed_joint elem1="${name}_24" elem2="${name}_25" />
+    <xacro:fixed_joint elem1="${name}_25" elem2="${name}_26" />
+
+    <xacro:fixed_joint elem1="${name}_26" elem2="${name}_31" />
+    <xacro:fixed_joint elem1="${name}_31" elem2="${name}_32" />
+    <xacro:fixed_joint elem1="${name}_32" elem2="${name}_33" />
+    <xacro:fixed_joint elem1="${name}_33" elem2="${name}_34" />
+    <xacro:fixed_joint elem1="${name}_34" elem2="${name}_35" />
+    <xacro:fixed_joint elem1="${name}_35" elem2="${name}_36" />
+
+    <xacro:fixed_joint elem1="${name}_36" elem2="${name}_41" />
+    <xacro:fixed_joint elem1="${name}_41" elem2="${name}_42" />
+    <xacro:fixed_joint elem1="${name}_42" elem2="${name}_43" />
+    <xacro:fixed_joint elem1="${name}_43" elem2="${name}_44" />
+    <xacro:fixed_joint elem1="${name}_44" elem2="${name}_45" />
+    <xacro:fixed_joint elem1="${name}_45" elem2="${name}_46" />
+
+    <xacro:fixed_joint elem1="${name}_46" elem2="${name}_51" />
+    <xacro:fixed_joint elem1="${name}_51" elem2="${name}_52" />
+    <xacro:fixed_joint elem1="${name}_52" elem2="${name}_53" />
+    <xacro:fixed_joint elem1="${name}_53" elem2="${name}_54" />
+    <xacro:fixed_joint elem1="${name}_54" elem2="${name}_55" />
+    <xacro:fixed_joint elem1="${name}_55" elem2="${name}_56" />
+
+    <xacro:fixed_joint elem1="${name}_56" elem2="${name}_61" />
+    <xacro:fixed_joint elem1="${name}_61" elem2="${name}_62" />
+    <xacro:fixed_joint elem1="${name}_62" elem2="${name}_63" />
+    <xacro:fixed_joint elem1="${name}_63" elem2="${name}_64" />
+    <xacro:fixed_joint elem1="${name}_64" elem2="${name}_65" />
+    <xacro:fixed_joint elem1="${name}_65" elem2="${name}_66" />
+
+
+  </xacro:macro>
+
 
   <xacro:macro name="sub_bloc" params="name x y z l1 l2 l3 m">
     <link name="${name}">
@@ -34,6 +179,10 @@
       <origin xyz="${x} ${y} ${z}"/>
     </inertial>
     </link>
+    <gazebo reference="${name}">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
   </xacro:macro>
 
   <xacro:macro name="fixed_joint" params="elem1 elem2">
@@ -44,24 +193,31 @@
   </xacro:macro>
 
 
-  <xacro:macro name="bloc4" params="name x y z l h m ep">
-    <xacro:sub_bloc name="${name}_1" x="${x}" y="${y+l/2}" z="${z+h/2}" l1="${l+ep}" l2="${ep}" l3="${h}" m="${m/4}" />
-    <xacro:sub_bloc name="${name}_2" x="${x}" y="${y-l/2}" z="${z+h/2}" l1="${l+ep}" l2="${ep}" l3="${h}" m="${m/4}" />
-    <xacro:sub_bloc name="${name}_3" x="${x+l/2}" y="${y}" z="${z+h/2}" l1="${ep}" l2="${l+ep}" l3="${h}" m="${m/4}" />
-    <xacro:sub_bloc name="${name}_4" x="${x-l/2}" y="${y}" z="${z+h/2}" l1="${ep}" l2="${l+ep}" l3="${h}" m="${m/4}" />
+  <xacro:macro name="bloc5" params="name x y z l h m ep">
+    <xacro:sub_bloc name="${name}_1" x="${x}" y="${y+l/2}" z="${z+h/2}" l1="${l+ep}" l2="${ep}" l3="${h}" m="${m/5}" />
+    <xacro:sub_bloc name="${name}_2" x="${x}" y="${y-l/2}" z="${z+h/2}" l1="${l+ep}" l2="${ep}" l3="${h}" m="${m/5}" />
+    <xacro:sub_bloc name="${name}_3" x="${x+l/2}" y="${y}" z="${z+h/2}" l1="${ep}" l2="${l+ep}" l3="${h}" m="${m/5}" />
+    <xacro:sub_bloc name="${name}_4" x="${x-l/2}" y="${y}" z="${z+h/2}" l1="${ep}" l2="${l+ep}" l3="${h}" m="${m/5}" />
+    <xacro:sub_bloc name="${name}_5" x="${x}" y="${y}" z="${z+h+ep/2}" l1="${l+ep}" l2="${l+ep}" l3="${ep}" m="${m/5}" />
 
     <xacro:fixed_joint elem1="${name}_1" elem2="${name}_2" />
     <xacro:fixed_joint elem1="${name}_2" elem2="${name}_3" />
     <xacro:fixed_joint elem1="${name}_3" elem2="${name}_4" />
+    <xacro:fixed_joint elem1="${name}_4" elem2="${name}_5" />
   </xacro:macro>
 
-  <xacro:macro name="bloc3" params="name x y z l1 l2 h m ep">
+  <xacro:macro name="bloc4" params="name x y z l1 l2 h m ep">
     <xacro:sub_bloc name="${name}_1" x="${x}" y="${y+l2/2}" z="${z+h/2}" l1="${l1+ep}" l2="${ep}" l3="${h}" m="${m/4}" />
     <xacro:sub_bloc name="${name}_2" x="${x}" y="${y-l2/2}" z="${z+h/2}" l1="${l1+ep}" l2="${ep}" l3="${h}" m="${m/4}" />
     <xacro:sub_bloc name="${name}_3" x="${x+l1/2}" y="${y}" z="${z+h/2}" l1="${ep}" l2="${l2+ep}" l3="${h}" m="${m/4}" />
+    <xacro:sub_bloc name="${name}_4" x="${x}" y="${y}" z="${z+h+ep/2}" l1="${l1+ep}" l2="${l2+ep}" l3="${ep}" m="${m/4}" />
+
+    <xacro:aruco name="${name}_aruco" x="${x}" y="${y}" z="${z+h+ep}" l="0.8" h="0.001" m="${m/1000}" />
 
     <xacro:fixed_joint elem1="${name}_1" elem2="${name}_2" />
     <xacro:fixed_joint elem1="${name}_2" elem2="${name}_3" />
+    <xacro:fixed_joint elem1="${name}_3" elem2="${name}_4" />
+    <xacro:fixed_joint elem1="${name}_4" elem2="${name}_aruco_11" />
   </xacro:macro>
 
   <xacro:macro name="wheel" params="name ep r m">
@@ -100,8 +256,8 @@
   </joint>
 
 
-  <xacro:bloc3 name="center" x="0.0" y="0.0" z="0.175" l1="0.8" l2="0.4" h="0.4" ep="0.05" m="15" />
-  <xacro:bloc4 name="catcher" x="-0.375" y="0.0" z="0.175" l="0.275" h="0.3" ep="0.01" m="0.1" />
+  <xacro:bloc4 name="center" x="0.0" y="0.0" z="0.175" l1="0.8" l2="0.4" h="0.4" ep="0.05" m="15" />
+  <xacro:bloc5 name="catcher" x="-0.375" y="0.0" z="0.175" l="0.275" h="0.3" ep="0.01" m="0.1" />
   <xacro:wheel name="left_front" r="0.20" ep="0.075" m="2"/>
   <xacro:wheel name="left_back" r="0.20" ep="0.075" m="2"/>
   <xacro:wheel name="right_front" r="0.20" ep="0.075" m="2"/>
