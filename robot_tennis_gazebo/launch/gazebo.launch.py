@@ -15,10 +15,9 @@ def generate_launch_description():
 	gazebo_node = IncludeLaunchDescription(PythonLaunchDescriptionSource([gazebo_path, '/gazebo.launch.py']))
 	
 	robot_state_publisher_node = Node(package='robot_state_publisher',executable='robot_state_publisher',parameters= [{"robot_description" : Command(["xacro"," ", xacro_path])}])
-	spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',arguments=['-entity', 'robot_1_description','-topic','/robot_description'])
+	spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',arguments=['-entity', 'robot_tennis','-topic','/robot_description'])
+	catcher_ctrl_node = Node(package='catcher_control',executable='ctrl')
 
 
-	
 
-
-	return LaunchDescription([robot_state_publisher_node,gazebo_node,spawn_entity])
+	return LaunchDescription([catcher_ctrl_node,robot_state_publisher_node,gazebo_node,spawn_entity])
