@@ -28,7 +28,7 @@ cv::Mat cameraMatrix, distCoeffs;
 std::vector<int> markerIds;
 std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
 cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-float marker_length = 0.8;
+float marker_length = 0.2;
 cv::Mat rot_mat(3, 3, cv::DataType<float>::type);
 
 float x_marker =-1;
@@ -112,6 +112,7 @@ class MinimalSubscriber : public rclcpp::Node
     			cv::aruco::estimatePoseSingleMarkers(markerCorners, marker_length, cameraMatrix, distCoeffs, rvecs, tvecs);
     			cv::aruco::drawAxis(frameCopy, cameraMatrix, distCoeffs, rvecs, tvecs, 0.1);
     			cout << "rvec : " << rvecs[0] << endl;
+          cout << "tvec : " << tvecs[0] << endl;
     			x_marker = -tvecs[0][0];
     			y_marker = -tvecs[0][1];
 
@@ -119,7 +120,7 @@ class MinimalSubscriber : public rclcpp::Node
 
           cv::Vec3d angles_marker = rotationMatrixToEulerAngles(rot_mat);
           yaw_marker = angles_marker[2];
-          cout << yaw_marker*180/3.1415 << endl;
+          cout << "yaw_marker" <<yaw_marker*180/3.1415 << endl;
 
           auto message = geometry_msgs::msg::Twist();
           message.linear.x = -x_marker + 7.92;
