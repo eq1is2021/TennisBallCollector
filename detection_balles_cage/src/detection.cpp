@@ -4,8 +4,7 @@
 #include <unistd.h>
 
 #include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/pose.hpp"
-#include "geometry_msgs/msg/pose_array.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 
 #include "sensor_msgs/msg/image.hpp"
 #include "std_msgs/msg/header.hpp"
@@ -51,6 +50,8 @@ class DetectionBalles : public rclcpp::Node
     : Node("node_detection")
     {
     	publisher_ = this->create_publisher<std_msgs::msg::Bool>("/catcher_up", 10);
+    	publisher_mvt = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
+    	
       	subscription_ = this->create_subscription<sensor_msgs::msg::Image>("/camera1/image_raw", rclcpp::SensorDataQoS(), std::bind(&DetectionBalles::image_callback, this, _1));
     }
 
@@ -59,6 +60,9 @@ class DetectionBalles : public rclcpp::Node
     {
     	std_msgs::msg::Bool msg_catcher_up;
     	msg_catcher_up.data = true;
+    	geometry_msgs::msg::Twist msg_mvt;
+    	msg_mvt.linear.x = 0.;
+    	msg_mvt.angular.z = 0.;
 
 		cv_bridge::CvImagePtr cv_ptr;
 		try
@@ -121,32 +125,31 @@ class DetectionBalles : public rclcpp::Node
 			{
 			    float perimeter = arcLength(contours[i],true);
 			    float area = contourArea(contours[i],true);
-			    if(4 * M_PI * abs(area) / pow(perimeter, 2) > 0.89)
+			    float critere = 4 * M_PI * abs(area) / pow(perimeter, 2);
+			    if(critere > 0.89)
 			    {
     				msg_catcher_up.data = false;
 			    }
-			    else
+			    else if(critere > 0.1)
 			    {
-			    	std::cout << "Not in" << std::endl;
-			    }
-			    /*std::cout <<  << " " << abs(area) << std::endl;
-			    if ((4 * M_PI * abs(area) / pow(perimeter, 2) > 0.6) && (abs(area) > 20)){
-			        approxPolyDP( contours[i], contours_poly[i], 3, true );
+			    	
+			    	approxPolyDP( contours[i], contours_poly[i], 3, true );
 			        minEnclosingCircle( contours_poly[i], centers[i], radius[i] );
+			        for (int i = 0; i < centers.size(); i++)
+			        {
+					    //circle( I, centers[i], (int)radius[i], 0, 2 );
+					    //std::cout << (centers[i].x - 400.)/400. << " " << (centers[i].y -400.)/400.<< std::endl;
+					    msg_mvt.linear.x = 0.3*atan((centers[i].y - 400.)/400.);
+    					msg_mvt.angular.z = 0.2*atan((centers[i].x - 400.)/400.);
+					}
+
 			    }
-			    */
+
 			}
 
-			/*for (int i = 0; i < centers.size(); i++){
-				//circle( I, centers[i], (int)radius[i], 0, 2 );
-				geometry_msgs::msg::Pose p;
-				p.position.x = centers[i].x;
-				p.position.y = centers[i].y;
-				p.position.z = 0.;
-				posearray.poses.push_back(p);
-			}
-			*/
+
 			publisher_->publish(msg_catcher_up);
+			publisher_mvt->publish(msg_mvt);
 			
 			imshow("Entrée",I);
 			waitKey(3);
@@ -160,6 +163,7 @@ class DetectionBalles : public rclcpp::Node
     }
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr publisher_;
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr publisher_mvt;
 };
 
 int main(int argc, char * argv[])
