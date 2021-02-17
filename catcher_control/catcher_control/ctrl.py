@@ -23,7 +23,7 @@ class WrenchSubPub(Node):
         msg = Wrench()
         msg.force.x = 0.0
         msg.force.y = 0.0
-        msg.force.z = (2.0 * (float)(self.isUp == True)) + (-1.0 * (float)(self.isUp == False))
+        msg.force.z = (60. * (float)(self.isUp == True)) + (-120.0 * (float)(self.isUp == False))
         msg.torque.x = 0.0
         msg.torque.y = 0.0
         msg.torque.z = 0.0
