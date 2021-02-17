@@ -8,6 +8,7 @@ import numpy as np
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import PoseArray
+from geometry_msgs.msg import Point
 from std_msgs.msg import Bool
 
 ###Création des variables globales - taille du terrain, taille du mur, zone d'entrée dans les buts et buts eux-mêmes
@@ -49,32 +50,32 @@ def test_lr(pos):
         return "right"
 
 #Fonction renvoyant la commande en cmd_vel à envoyer au robot pour qu'il se déplace vers une position cible
-def command_objective(pos_robot,pos_target):
-    dist,angle_diff = get_dist_angle(pos_robot,pos_target)
-    cmd = Twist()
-    if abs(angle_diff) > np.radians(20):
-        cmd.linear.x = 0
-        cmd.linear.y = 0
-        cmd.linear.z = 0
-        cmd.angular.x = 0
-        cmd.angular.y = 0
-        cmd.angular.z = -0.1*angle_diff
-    else:
-        cmd.linear.x = 0.5
-        cmd.linear.y = 0
-        cmd.linear.z = 0
-        cmd.angular.x = 0
-        cmd.angular.y = 0
-        cmd.angular.z = -0.1*angle_diff
-    return(cmd)
+# def command_objective(pos_robot,pos_target):
+#     dist,angle_diff = get_dist_angle(pos_robot,pos_target)
+#     cmd = Twist()
+#     if abs(angle_diff) > np.radians(20):
+#         cmd.linear.x = 0
+#         cmd.linear.y = 0
+#         cmd.linear.z = 0
+#         cmd.angular.x = 0
+#         cmd.angular.y = 0
+#         cmd.angular.z = -0.1*angle_diff
+#     else:
+#         cmd.linear.x = 0.5
+#         cmd.linear.y = 0
+#         cmd.linear.z = 0
+#         cmd.angular.x = 0
+#         cmd.angular.y = 0
+#         cmd.angular.z = -0.1*angle_diff
+#     return(cmd)
 
 #Fonction de test pour voir si on est dans la zone d'entrée du but
 def test_goal_zone(pos_robot):
-    x_diff_left=goal_zone_left_x[0]-pos_robot[0]
-    y_diff_left=goal_zone_left_y[1]-pos_robot[1]
+    x_diff_left=goal_zone_left_x-pos_robot[0]
+    y_diff_left=goal_zone_left_y-pos_robot[1]
     dist_left=np.linalg.norm([x_diff_left, y_diff_left])
-    x_diff_right=goal_zone_right_x[0]-pos_robot[0]
-    y_diff_right=goal_zone_right_y[1]-pos_robot[1]
+    x_diff_right=goal_zone_right_x-pos_robot[0]
+    y_diff_right=goal_zone_right_y-pos_robot[1]
     dist_right=np.linalg.norm([x_diff_right, y_diff_right])
     if dist_left < 1 or dist_right < 1:
         return True
@@ -82,11 +83,11 @@ def test_goal_zone(pos_robot):
         return False
 
 def test_goal(pos_robot):
-    x_diff_left=goal_left_x[0]-pos_robot[0]
-    y_diff_left=goal_left_y[1]-pos_robot[1]
+    x_diff_left=goal_left_x-pos_robot[0]
+    y_diff_left=goal_left_y-pos_robot[1]
     dist_left=np.linalg.norm([x_diff_left, y_diff_left])
-    x_diff_right=goal_right_x[0]-pos_robot[0]
-    y_diff_right=goal_right_y[1]-pos_robot[1]
+    x_diff_right=goal_right_x-pos_robot[0]
+    y_diff_right=goal_right_y-pos_robot[1]
     dist_right=np.linalg.norm([x_diff_right, y_diff_right])
     if dist_left < 1 or dist_right < 1:
         return True
@@ -98,7 +99,7 @@ def test_ball_near(pos_robot,pos_balle,d):
     x_diff=pos_balle[0]-pos_robot[0]
     y_diff=pos_balle[1]-pos_robot[1]
     dist=np.linalg.norm([x_diff, y_diff])
-    if dist < d && (test_lr(pos_robot[0])==test_lr(pos_balle[0])) && pos_balle[2]=1:
+    if dist < d and (test_lr(pos_robot[0])==test_lr(pos_balle[0])) and pos_balle[2]==1:
         return True
     else:
         return False
@@ -153,8 +154,8 @@ class Robot_Control(Node):
 
         #Publisher de la commande de mouvement
         self.publisher_ = self.create_publisher(
-            Twist,
-            'cmd_vel',
+            Point,
+            'robot_objective',
             10)
 
         #Création boucle commande
@@ -207,12 +208,12 @@ class Robot_Control(Node):
     def control_callback(self):
         # On initialise une absence d'objectif
         self.has_objective = False
-        self.objective_x,self.objective_y = 0,0
+        self.objective_x,self.objective_y,self.objective_z = 0.,0.,0.
         # Si le robot a une balle dans son panier
         if self.has_ball:
             # On regarde si il y a une balle tout près
             for i in range(10):
-                if test_ball_near(self.pos_robot,self.pos_balle[i],d) && :
+                if test_ball_near(self.pos_robot,self.pos_balle[i],d):
                     self.objective_x,self.objective_y=self.pos_balle[i,0],self.pos_balle[i,1]
                     self.has_objective = True
                     # S'il y en a une, on va la chercher
@@ -222,26 +223,32 @@ class Robot_Control(Node):
                 if loc_robot(self.pos_robot[0]) == "left":
                     if test_goal(self.pos_robot):
                         self.objective_x,self.objective_y = 0,0
+                        self.objective_z = 2
                         self.has_objective = True
                     else:
                         if test_goal_zone(self.pos_robot) or self.goal_status: # S'il est dans la zone d'entrée du but, ou s'il est en train d'aller vers le but, il va vers le but
                             self.objective_x,self.objective_y = goal_left_x,goal_left_y
+                            self.objective_z = 1
                             self.goal_status = True
                             self.has_objective = True
                         else: #Sinon, il se dirige vers la zone d'entrée de but
                             self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
+                            self.objective_z = 1
                             self.has_objective = True
                 else:
                     if test_goal(self.pos_robot):
                         self.objective_x,self.objective_y = 0,0
+                        self.objective_z = 2
                         self.has_objective = True
                     else:
                         if test_goal_zone(self.pos_robot) or self.goal_status:
                             self.objective_x,self.objective_y = goal_right_x,goal_right_y
+                            self.objective_z = 1
                             self.has_objective = True
                             self.goal_status = True
                         else:
                             self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
+                            self.objective_z = 1
                             self.has_objective = True
         else:
             # Si le robot n'a pas de balle, il ne doit pas aller vers le but de toute façon.
@@ -249,8 +256,10 @@ class Robot_Control(Node):
             if test_goal(self.pos_robot):
                 if loc_robot(self.pos_robot[0]) == "left":
                     self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
+                    self.objective_z = 1
                 else:
                     self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
+                    self.objective_z = 1
             else:
                 if self.num_balle > 0:
                     if self.balle_target_id == -1:
@@ -264,9 +273,14 @@ class Robot_Control(Node):
                     else:
                         # Sinon, le robot va vers le passage dans le mur le plus proche
                         self.objective_x,self.objective_y=get_passage_wall(self.pos_robot)
+                        self.objective_z = 1
                         self.has_objective = True
         # Enfin, on envoie la commande du robot
-        self.commande_robot=command_objective(self.pos_robot,[self.objective_x,self.objective_y])
+        # self.commande_robot=command_objective(self.pos_robot,[self.objective_x,self.objective_y])
+        objectif = Point()
+        objectif.x, objectif.y, objectif.z = self.objective_x,self.objective_y,self.objective_z
+        self.publisher_.publish(objectif)
+
 
 def main(args=None):
     rclpy.init(args=args)
