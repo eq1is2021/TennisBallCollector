@@ -14,6 +14,7 @@ git clone https://github.com/{User}/TennisBallCollector.git
 
 Ensuite, compilation :
 ```
+cd ..
 colcon build --symlink-install
 
 ```
@@ -49,10 +50,12 @@ et enfin :
 
 
 
-Pour démarrer la simulation (le court de tennis) : 
+Pour démarrer la simulation (le court de tennis seul) : 
 ```
 ros2 launch tennis_court tennis_court.launch.py
 ```
+
+Pour démarrer la simulation avec le robot : 
 ```
 ros2 launch tennis_court launcher.launch.py
 ```
