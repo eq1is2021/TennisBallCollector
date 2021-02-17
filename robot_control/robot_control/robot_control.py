@@ -71,11 +71,11 @@ def test_lr(pos):
 
 #Fonction de test pour voir si on est dans la zone d'entrée du but
 def test_goal_zone(pos_robot):
-    x_diff_left=goal_zone_left_x[0]-pos_robot[0]
-    y_diff_left=goal_zone_left_y[1]-pos_robot[1]
+    x_diff_left=goal_zone_left_x-pos_robot[0]
+    y_diff_left=goal_zone_left_y-pos_robot[1]
     dist_left=np.linalg.norm([x_diff_left, y_diff_left])
-    x_diff_right=goal_zone_right_x[0]-pos_robot[0]
-    y_diff_right=goal_zone_right_y[1]-pos_robot[1]
+    x_diff_right=goal_zone_right_x-pos_robot[0]
+    y_diff_right=goal_zone_right_y-pos_robot[1]
     dist_right=np.linalg.norm([x_diff_right, y_diff_right])
     if dist_left < 1 or dist_right < 1:
         return True
@@ -83,11 +83,11 @@ def test_goal_zone(pos_robot):
         return False
 
 def test_goal(pos_robot):
-    x_diff_left=goal_left_x[0]-pos_robot[0]
-    y_diff_left=goal_left_y[1]-pos_robot[1]
+    x_diff_left=goal_left_x-pos_robot[0]
+    y_diff_left=goal_left_y-pos_robot[1]
     dist_left=np.linalg.norm([x_diff_left, y_diff_left])
-    x_diff_right=goal_right_x[0]-pos_robot[0]
-    y_diff_right=goal_right_y[1]-pos_robot[1]
+    x_diff_right=goal_right_x-pos_robot[0]
+    y_diff_right=goal_right_y-pos_robot[1]
     dist_right=np.linalg.norm([x_diff_right, y_diff_right])
     if dist_left < 1 or dist_right < 1:
         return True
@@ -99,7 +99,7 @@ def test_ball_near(pos_robot,pos_balle,d):
     x_diff=pos_balle[0]-pos_robot[0]
     y_diff=pos_balle[1]-pos_robot[1]
     dist=np.linalg.norm([x_diff, y_diff])
-    if dist < d && (test_lr(pos_robot[0])==test_lr(pos_balle[0])) && pos_balle[2]=1:
+    if dist < d and (test_lr(pos_robot[0])==test_lr(pos_balle[0])) and pos_balle[2]==1:
         return True
     else:
         return False
@@ -208,12 +208,12 @@ class Robot_Control(Node):
     def control_callback(self):
         # On initialise une absence d'objectif
         self.has_objective = False
-        self.objective_x,self.objective_y,self.objective_z = 0,0,0
+        self.objective_x,self.objective_y,self.objective_z = 0.,0.,0.
         # Si le robot a une balle dans son panier
         if self.has_ball:
             # On regarde si il y a une balle tout près
             for i in range(10):
-                if test_ball_near(self.pos_robot,self.pos_balle[i],d) && :
+                if test_ball_near(self.pos_robot,self.pos_balle[i],d):
                     self.objective_x,self.objective_y=self.pos_balle[i,0],self.pos_balle[i,1]
                     self.has_objective = True
                     # S'il y en a une, on va la chercher
