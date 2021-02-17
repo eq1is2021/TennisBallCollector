@@ -221,53 +221,54 @@ class Robot_Control(Node):
         # Si le robot a une balle dans son panier
         if self.has_ball:
             print("Has Ball")
-            # On regarde si il y a une balle tout près
-            for i in range(10):
-                if test_ball_near(self.pos_robot,self.pos_balle[i],d):
-                    print("Ball Near")
-                    self.objective_x,self.objective_y=self.pos_balle[i,0],self.pos_balle[i,1]
+            # Partie commentée: une seule balle à la fois, on ne peut pas en prendre plusieurs
+            # # On regarde si il y a une balle tout près
+            # for i in range(10):
+            #     if test_ball_near(self.pos_robot,self.pos_balle[i],d):
+            #         print("Ball Near")
+            #         self.objective_x,self.objective_y=self.pos_balle[i,0],self.pos_balle[i,1]
+            #         self.has_objective = True
+            #         # S'il y en a une, on va la chercher
+            # # Si le robot n'a pas de balle tout près à chercher
+            # if not self.has_objective:
+            # S'il est à gauche
+            if loc_robot(self.pos_robot[0]) == "left":
+                print("Robot - Left")
+                if test_goal(self.pos_robot):
+                    print("Inside Goal Zone - Stop")
+                    self.objective_x,self.objective_y = 0,0
+                    self.objective_z = 2
                     self.has_objective = True
-                    # S'il y en a une, on va la chercher
-            # Si le robot n'a pas de balle tout près à chercher
-            if not self.has_objective:
-                # S'il est à gauche
-                if loc_robot(self.pos_robot[0]) == "left":
-                    print("Robot - Left")
-                    if test_goal(self.pos_robot):
-                        print("Inside Goal Zone - Stop")
-                        self.objective_x,self.objective_y = 0,0
-                        self.objective_z = 2
-                        self.has_objective = True
-                    else:
-                        if test_goal_zone(self.pos_robot) or self.goal_status: # S'il est dans la zone d'entrée du but, ou s'il est en train d'aller vers le but, il va vers le but
-                            print("Moving Toward Goal")
-                            self.objective_x,self.objective_y = goal_left_x,goal_left_y
-                            self.objective_z = 1
-                            self.goal_status = True
-                            self.has_objective = True
-                        else: #Sinon, il se dirige vers la zone d'entrée de but
-                            print("Moving Toward Goal Entry Zone")
-                            self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
-                            self.objective_z = 1
-                            self.has_objective = True
                 else:
-                    print("Robot - Right")
-                    if test_goal(self.pos_robot):
-                        self.objective_x,self.objective_y = 0,0
-                        self.objective_z = 2
+                    if test_goal_zone(self.pos_robot) or self.goal_status: # S'il est dans la zone d'entrée du but, ou s'il est en train d'aller vers le but, il va vers le but
+                        print("Moving Toward Goal")
+                        self.objective_x,self.objective_y = goal_left_x,goal_left_y
+                        self.objective_z = 1
+                        self.goal_status = True
                         self.has_objective = True
+                    else: #Sinon, il se dirige vers la zone d'entrée de but
+                        print("Moving Toward Goal Entry Zone")
+                        self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
+                        self.objective_z = 1
+                        self.has_objective = True
+            else:
+                print("Robot - Right")
+                if test_goal(self.pos_robot):
+                    self.objective_x,self.objective_y = 0,0
+                    self.objective_z = 2
+                    self.has_objective = True
+                else:
+                    if test_goal_zone(self.pos_robot) or self.goal_status:
+                        print("Moving Toward Goal")
+                        self.objective_x,self.objective_y = goal_right_x,goal_right_y
+                        self.objective_z = 1
+                        self.has_objective = True
+                        self.goal_status = True
                     else:
-                        if test_goal_zone(self.pos_robot) or self.goal_status:
-                            print("Moving Toward Goal")
-                            self.objective_x,self.objective_y = goal_right_x,goal_right_y
-                            self.objective_z = 1
-                            self.has_objective = True
-                            self.goal_status = True
-                        else:
-                            print("Moving Toward Goal Entry Zone")
-                            self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
-                            self.objective_z = 1
-                            self.has_objective = True
+                        print("Moving Toward Goal Entry Zone")
+                        self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
+                        self.objective_z = 1
+                        self.has_objective = True
         else:
             # Si le robot n'a pas de balle, il ne doit pas aller vers le but de toute façon.
             self.goal_status = False
