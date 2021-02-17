@@ -19,7 +19,7 @@ setup(
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': [
+        'console_scripts': [ 'rbt_control = robot_control.rbt_control:main'
         ],
     },
 )

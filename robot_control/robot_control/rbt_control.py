@@ -75,19 +75,20 @@ def test_goal_zone(pos_robot):
     x_diff_right=goal_zone_right_x-pos_robot[0]
     y_diff_right=goal_zone_right_y-pos_robot[1]
     dist_right=np.linalg.norm([x_diff_right, y_diff_right])
-    if dist_left < 1 or dist_right < 1:
+    if dist_left < 2 or dist_right < 2:
         return True
     else:
         return False
 
 def test_goal(pos_robot):
+    # print("testing goal_robot")
     x_diff_left=goal_left_x-pos_robot[0]
     y_diff_left=goal_left_y-pos_robot[1]
     dist_left=np.linalg.norm([x_diff_left, y_diff_left])
     x_diff_right=goal_right_x-pos_robot[0]
     y_diff_right=goal_right_y-pos_robot[1]
     dist_right=np.linalg.norm([x_diff_right, y_diff_right])
-    if dist_left < 1 or dist_right < 1:
+    if dist_left < 2 or dist_right < 2:
         return True
     else:
         return False
@@ -167,43 +168,53 @@ class Robot_Control(Node):
 
     def ball_position_callback(self, msg):
         #Callback des balles, on sauvegarde les variables reçues dans pos_balles et num_balles
+        # print("ball_position_callback")
         self.num_balle = 0 #
         for i in range(10):
             self.pos_balle[i,0]=msg.poses[i].position.x
             self.pos_balle[i,1]=msg.poses[i].position.y
             self.pos_balle[i,2]=msg.poses[i].position.z
-            if msg.poses[i].position.z > 1:
+            if msg.poses[i].position.z > 0.5:
                 # Si la balle existe, on la compte
                 self.num_balle += 1
+                # print(self.num_balle)
 
     def ball_inside_callback(self, msg):
         #Booléen indiquant si on a une balle dans la cage ou pas
         self.has_ball=msg.data
 
     def get_ball_target_id(self):
+        print("calling get_ball_target_id")
         # Renvoie l'id de la balle à aller chercher
         # On initialise une absence de balle cible
-        balle_target_id = -1
+        self.balle_target_id = -1
         weight = 0
         # On parcours toutes les balles
         for i in range(10):
             # Si la balle existe
+            # print(self.pos_balle[i][2])
             if self.pos_balle[i][2]>0:
+                # print("testing ball: ",i)
                 # Poids de l'id
                 weight_id = ((10-i)/10)*2/3
                 dist_ball=get_dist(self.pos_robot,self.pos_balle[i])
+                # print("dist_ball: ",dist_ball)
                 dist_max=np.linalg.norm([terrain_x, terrain_y])
                 # Poids de la distance
                 weight_dist=((dist_max-dist_ball)/dist_max)*1/3
                 # Poids total de la balle
                 weight_ball = weight_id+weight_dist
+                # print("weight: ",weight)
+                # print("weight_ball: ",weight_ball)
                 # Si le poids est supérieur au poids enregistré, on l'enregistre
                 if weight_ball > weight:
                     weight = weight_ball
-                    balle_target_id = i
+                    self.balle_target_id = i
+                    print("self.balle_target_id: ",self.balle_target_id)
                 # En sortie de boucle, on a donc l'id de la balle avec le poids le plus élevé
 
     def control_callback(self):
+        # print(self.pos_balle)
         # On initialise une absence d'objectif
         self.has_objective = False
         self.objective_x,self.objective_y,self.objective_z = 0.,0.,0.
@@ -263,7 +274,7 @@ class Robot_Control(Node):
             print("No Ball")
             if test_goal(self.pos_robot):
                 print("Inside Goal")
-                if loc_robot(self.pos_robot[0]) == "left":
+                if test_lr(self.pos_robot[0]) == "left":
                     print("Going Outside - Left")
                     self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
                     self.objective_z = 1
@@ -277,12 +288,14 @@ class Robot_Control(Node):
                 if self.num_balle > 0:
                     if self.balle_target_id == -1:
                         # On prends la balle avec le poids le plus élevé
-                        self.balle_target_id=get_ball_target_id(self)
-                        print("Target Ball: ",balle_target_id)
+                        self.get_ball_target_id()
+                    print("Target Ball: ",self.balle_target_id)
                     # Si le robot et la balle sont du même côté:
-                    if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id,0]):
+                    # print("self.pos_robot[0]: ",self.pos_robot[0])
+                    # print("self.pos_balle[self.balle_target_id][0]: ",self.pos_balle[self.balle_target_id][0])
+                    if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id][0]):
                         print("Robot and Ball in the same side")
-                        self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id,0],self.pos_balle[self.balle_target_id,1]
+                        self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id][0],self.pos_balle[self.balle_target_id][1]
                         self.has_objective = True
                         # Le robot va chercher la balle
                     else:
@@ -294,7 +307,7 @@ class Robot_Control(Node):
         # Enfin, on envoie la commande du robot
         # self.commande_robot=command_objective(self.pos_robot,[self.objective_x,self.objective_y])
         objectif = Point()
-        objectif.x, objectif.y, objectif.z = self.objective_x,self.objective_y,self.objective_z
+        objectif.x, objectif.y, objectif.z = float(self.objective_x),float(self.objective_y),float(self.objective_z)
         self.publisher_.publish(objectif)
 
 def main(args=None):
