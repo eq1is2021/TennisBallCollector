@@ -118,7 +118,7 @@ class DetectionBalles : public rclcpp::Node
 
 		        int x_offset = 30;
         		int y_offset = 683;
-        		float scale = 0.009883720930232558;
+        		float scale = 0.02481389578163772;
 
 				geometry_msgs::msg::Pose p;
 				if(boundRect[i].x < mask.cols/2.){
