@@ -1,6 +1,6 @@
 # Tennis Ball Collector
 
-Ceci est un template de dépôt Git pour le cours d'ingénierie système et modélisation robotique à l'ENSTA Bretagne en 2021.
+Ce dépôt propose une solution afin de récupérer les balles sur un terrain de tennis et les ramener dans des zones.
 
 ## Installation
 
@@ -29,7 +29,7 @@ Et ajouter la ligne :
 source /home/{User}/wk_ros_tennis/install/setup.bash
 ```
 
-Puis relancer la console ou 
+Puis relancer la console ou tapper :
 ```
 bash
 ```
@@ -42,13 +42,15 @@ et enfin :
 
 ## Lancer la simulation
 
-### Dépendences
+### Dépendances
 
+Pour eloquent :
 - ros-eloquent-vision-opencv
 
+Pour foxy (peut-être nécesssaire) :
+- ros-foxy-image-pipeline
+
 ### Démarrer la simulation
-
-
 
 Pour démarrer la simulation (le court de tennis seul) : 
 ```
@@ -60,25 +62,32 @@ Pour démarrer la simulation avec le robot :
 ros2 launch tennis_court launcher.launch.py
 ```
 
-
-
 Pour démarrer la detection de balles :
 ```
 ros2 run detection_balles detection_balles
 ```
 
-Pour démarrer la labelisation des balles : 
+Pour démarrer la labelisation des balles:
+(nécessite d'avoir démarrer le node de détection des balles)
 
 ```
 ros2 run labelisation_balles labelisation
-
 ```
 
 Pour démarrer la localisation des arucos :
 
 ```
 ros2 run localisation_aruco viewer
+```
 
+Pour démarrer la détection des personnes :
+```
+ros2 run detection_joueurs detection_joueurs
+```
+
+Pour démarrer la préhension des balles (attrape les balles proches) :
+```
+ros2 run detection_balles_cage detection_balles_cage
 ```
 
 ## Groupe
