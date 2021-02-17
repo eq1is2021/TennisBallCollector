@@ -80,8 +80,11 @@ class MinimalSubscriber : public rclcpp::Node
     MinimalSubscriber()
     : Node("minimal_subscriber")
     {
+      // subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
+      // "/zenith_camera/image_raw", 10, std::bind(&MinimalSubscriber::image_callback, this, _1));
+
       subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-      "/zenith_camera/image_raw", 10, std::bind(&MinimalSubscriber::image_callback, this, _1));
+      "/zenith_camera/image_raw", rclcpp::SensorDataQoS(), std::bind(&MinimalSubscriber::image_callback, this, _1));
 
       publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/aruco_twist", 10);
     }
@@ -100,12 +103,13 @@ class MinimalSubscriber : public rclcpp::Node
 			cv::Mat frameCopy;
     		frame.copyTo(frameCopy);
 
-      Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
-      params->doCornerRefinement = true;
-			
+      //Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
+      //params->doCornerRefinement = true;
+
     	// detection du marker 0
 		  std::vector<cv::Vec3d> rvecs, tvecs;
-		  cv::aruco::detectMarkers(frameCopy, dictionary, markerCorners, markerIds,params);
+		  cv::aruco::detectMarkers(frameCopy, dictionary, markerCorners, markerIds);
+      //cv::aruco::detectMarkers(frameCopy, dictionary, markerCorners, markerIds,params);
 
 	    visualization_msgs::msg::MarkerArray marker_array_msg;
 	    marker_array_msg.markers.resize(2);
