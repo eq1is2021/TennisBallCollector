@@ -9,6 +9,7 @@
 
 #include "sensor_msgs/msg/image.hpp"
 #include "std_msgs/msg/header.hpp"
+#include "std_msgs/msg/bool.hpp"
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -49,20 +50,15 @@ class DetectionBalles : public rclcpp::Node
     DetectionBalles()
     : Node("node_detection")
     {
-    	publisher_ = this->create_publisher<geometry_msgs::msg::PoseArray>("balles_coords", 10);
-      	subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
-      	"/zenith_camera/image_raw", rclcpp::SensorDataQoS(), std::bind(&DetectionBalles::image_callback, this, _1));
+    	publisher_ = this->create_publisher<std_msgs::msg::Bool>("/catcher_up", 10);
+      	subscription_ = this->create_subscription<sensor_msgs::msg::Image>("/camera1/image_raw", rclcpp::SensorDataQoS(), std::bind(&DetectionBalles::image_callback, this, _1));
     }
 
   private:
     void image_callback(const sensor_msgs::msg::Image::SharedPtr msg) const
     {
-		std_msgs::msg::Header msg_header = msg->header;
-		std::string frame_id = msg_header.frame_id.c_str();
-		//RCLCPP_INFO(this->get_logger(), "New Image from %s", frame_id);
-
-		geometry_msgs::msg::PoseArray posearray;
-		posearray.header.frame_id = "root_link";
+    	std_msgs::msg::Bool msg_catcher_up;
+    	msg_catcher_up.data = true;
 
 		cv_bridge::CvImagePtr cv_ptr;
 		try
@@ -79,7 +75,7 @@ class DetectionBalles : public rclcpp::Node
 			inRange(hsv, min, max,mask);
 			bitwise_and(hsv,hsv,res,mask);
 			cvtColor(res,res,COLOR_HSV2BGR);
-			//imshow("res",res);
+			imshow("res",res);
 			// --------------------------
 			// Lissage de l'image
 			// --------------------------
@@ -125,14 +121,23 @@ class DetectionBalles : public rclcpp::Node
 			{
 			    float perimeter = arcLength(contours[i],true);
 			    float area = contourArea(contours[i],true);
-			    //std::cout << 4 * M_PI * abs(area) / pow(perimeter, 2) << " " << abs(area) << std::endl;
+			    if(4 * M_PI * abs(area) / pow(perimeter, 2) > 0.89)
+			    {
+    				msg_catcher_up.data = false;
+			    }
+			    else
+			    {
+			    	std::cout << "Not in" << std::endl;
+			    }
+			    /*std::cout <<  << " " << abs(area) << std::endl;
 			    if ((4 * M_PI * abs(area) / pow(perimeter, 2) > 0.6) && (abs(area) > 20)){
 			        approxPolyDP( contours[i], contours_poly[i], 3, true );
 			        minEnclosingCircle( contours_poly[i], centers[i], radius[i] );
 			    }
+			    */
 			}
 
-			for (int i = 0; i < centers.size(); i++){
+			/*for (int i = 0; i < centers.size(); i++){
 				//circle( I, centers[i], (int)radius[i], 0, 2 );
 				geometry_msgs::msg::Pose p;
 				p.position.x = centers[i].x;
@@ -140,8 +145,10 @@ class DetectionBalles : public rclcpp::Node
 				p.position.z = 0.;
 				posearray.poses.push_back(p);
 			}
-			//imshow("Entrée",I);
-			publisher_->publish(posearray);
+			*/
+			publisher_->publish(msg_catcher_up);
+			
+			imshow("Entrée",I);
 			waitKey(3);
 
 		}
@@ -152,7 +159,7 @@ class DetectionBalles : public rclcpp::Node
     	}
     }
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
-    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr publisher_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr publisher_;
 };
 
 int main(int argc, char * argv[])
