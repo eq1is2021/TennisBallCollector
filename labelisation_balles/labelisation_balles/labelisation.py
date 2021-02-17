@@ -107,7 +107,7 @@ class Labeliser(Node):
         msg = PoseArray() 
         x_offset = 30
         y_offset = 683
-        scale = 0.009883720930232558
+        scale = 0.02481389578163772
         for i in range(10):
             pose = Pose() 
             pose.position.x = (self.array_balles.poses[i].position.x-x_offset)*scale
