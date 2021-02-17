@@ -24,11 +24,12 @@ using namespace std;
 using namespace cv;
 using namespace std::chrono_literals;
 
-cv::Mat cameraMatrix, distCoeffs;
+cv::Mat cameraMatrix = (Mat_<double>(3,3) << 325.7395873530012, 0, 640.5, 0, 325.7395873530012, 360.5, 0, 0, 1); 
+cv::Mat distCoeffs = (Mat_<double>(5,1) << 0, 0, 0, 0, 0);
 std::vector<int> markerIds;
 std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
 cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-float marker_length = 0.2;
+float marker_length = 0.17;
 cv::Mat rot_mat(3, 3, cv::DataType<float>::type);
 
 float x_marker =-1;
@@ -98,16 +99,20 @@ class MinimalSubscriber : public rclcpp::Node
 			Mat frame = cv_ptr->image;
 			cv::Mat frameCopy;
     		frame.copyTo(frameCopy);
+
+      Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
+      params->doCornerRefinement = true;
 			
     	// detection du marker 0
 		  std::vector<cv::Vec3d> rvecs, tvecs;
-		  cv::aruco::detectMarkers(frameCopy, dictionary, markerCorners, markerIds);
+		  cv::aruco::detectMarkers(frameCopy, dictionary, markerCorners, markerIds,params);
 
 	    visualization_msgs::msg::MarkerArray marker_array_msg;
 	    marker_array_msg.markers.resize(2);
 
-	    if (markerIds.size()>0) {
+	    if (markerIds.size()==1 and markerIds[0]==0) {
 	    	// tracé des arucos sur l'image
+
     			cv::aruco::drawDetectedMarkers(frameCopy, markerCorners, markerIds,cv::Scalar(255, 0, 0));
     			cv::aruco::estimatePoseSingleMarkers(markerCorners, marker_length, cameraMatrix, distCoeffs, rvecs, tvecs);
     			cv::aruco::drawAxis(frameCopy, cameraMatrix, distCoeffs, rvecs, tvecs, 0.1);
@@ -120,15 +125,15 @@ class MinimalSubscriber : public rclcpp::Node
 
           cv::Vec3d angles_marker = rotationMatrixToEulerAngles(rot_mat);
           yaw_marker = angles_marker[2];
-          cout << "yaw_marker" <<yaw_marker*180/3.1415 << endl;
+          cout << "yaw_marker  " <<yaw_marker*180/3.1415 << endl;
 
           auto message = geometry_msgs::msg::Twist();
           message.linear.x = -x_marker + 7.92;
-          message.linear.y = y_marker + 3.18;
+          message.linear.y = (y_marker + 3.18);
           message.linear.z = 0;
           message.angular.x = 0;
           message.angular.y = 0;
-          message.angular.z = yaw_marker;
+          message.angular.z = -atan2(sin(yaw_marker + 3*M_PI/2.),cos(yaw_marker + 3*M_PI/2.));
           publisher_->publish(message);
 
     			imshow("Entrée",frameCopy);
@@ -154,13 +159,13 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
 
-    // get calibration parameters
-    cv::FileStorage storage1("./localisation_aruco/src/cameraMatrix.ext", cv::FileStorage::READ);
-    storage1["cameraMatrix"] >> cameraMatrix;
-    storage1.release();
-    cv::FileStorage storage2("./localisation_aruco/src/distCoeffs.ext", cv::FileStorage::READ);
-    storage2["distCoeffs"] >> distCoeffs;
-    storage2.release();
+    // // get calibration parameters
+    // cv::FileStorage storage1("./localisation_aruco/src/cameraMatrix.ext", cv::FileStorage::READ);
+    // storage1["cameraMatrix"] >> cameraMatrix;
+    // storage1.release();
+    // cv::FileStorage storage2("./localisation_aruco/src/distCoeffs.ext", cv::FileStorage::READ);
+    // storage2["distCoeffs"] >> distCoeffs;
+    // storage2.release();
 
   rclcpp::spin(std::make_shared<MinimalSubscriber>());
   rclcpp::shutdown();
