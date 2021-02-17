@@ -75,6 +75,8 @@ def test_goal_zone(pos_robot):
     x_diff_right=goal_zone_right_x-pos_robot[0]
     y_diff_right=goal_zone_right_y-pos_robot[1]
     dist_right=np.linalg.norm([x_diff_right, y_diff_right])
+    # print("dist_left: ", dist_left)
+    # print("dist_right: ", dist_right)
     if dist_left < 2 or dist_right < 2:
         return True
     else:
@@ -88,6 +90,8 @@ def test_goal(pos_robot):
     x_diff_right=goal_right_x-pos_robot[0]
     y_diff_right=goal_right_y-pos_robot[1]
     dist_right=np.linalg.norm([x_diff_right, y_diff_right])
+    # print("dist_left: ", dist_left)
+    # print("dist_right: ", dist_right)
     if dist_left < 2 or dist_right < 2:
         return True
     else:
@@ -232,7 +236,7 @@ class Robot_Control(Node):
             # # Si le robot n'a pas de balle tout près à chercher
             # if not self.has_objective:
             # S'il est à gauche
-            if loc_robot(self.pos_robot[0]) == "left":
+            if test_lr(self.pos_robot[0]) == "left":
                 print("Robot - Left")
                 if test_goal(self.pos_robot):
                     print("Inside Goal Zone - Stop")
@@ -254,6 +258,7 @@ class Robot_Control(Node):
             else:
                 print("Robot - Right")
                 if test_goal(self.pos_robot):
+                    print("Inside Goal Zone")
                     self.objective_x,self.objective_y = 0,0
                     self.objective_z = 2
                     self.has_objective = True
