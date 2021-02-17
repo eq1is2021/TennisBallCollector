@@ -99,10 +99,13 @@ class MinimalSubscriber : public rclcpp::Node
 			Mat frame = cv_ptr->image;
 			cv::Mat frameCopy;
     		frame.copyTo(frameCopy);
+
+      Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
+      params->doCornerRefinement = true;
 			
     	// detection du marker 0
 		  std::vector<cv::Vec3d> rvecs, tvecs;
-		  cv::aruco::detectMarkers(frameCopy, dictionary, markerCorners, markerIds);
+		  cv::aruco::detectMarkers(frameCopy, dictionary, markerCorners, markerIds,params);
 
 	    visualization_msgs::msg::MarkerArray marker_array_msg;
 	    marker_array_msg.markers.resize(2);
@@ -130,7 +133,7 @@ class MinimalSubscriber : public rclcpp::Node
           message.linear.z = 0;
           message.angular.x = 0;
           message.angular.y = 0;
-          message.angular.z = yaw_marker;
+          message.angular.z = -atan2(sin(yaw_marker + 3*M_PI/2.),cos(yaw_marker + 3*M_PI/2.));
           publisher_->publish(message);
 
     			imshow("Entrée",frameCopy);
