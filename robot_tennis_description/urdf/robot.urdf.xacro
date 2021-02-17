@@ -256,12 +256,73 @@
   </joint>
 
 
-  <xacro:bloc4 name="center" x="0.0" y="0.0" z="0.175" l1="0.8" l2="0.4" h="0.4" ep="0.05" m="15" />
+
+
+
+
+  <xacro:bloc4 name="center" x="0.0" y="0.0" z="0.175" l1="0.8" l2="0.4" h="0.4" ep="0.05" m="10" />
   <xacro:bloc5 name="catcher" x="-0.375" y="0.0" z="0.175" l="0.275" h="0.3" ep="0.01" m="3" />
   <xacro:wheel name="left_front" r="0.20" ep="0.075" m="3"/>
   <xacro:wheel name="left_back" r="0.20" ep="0.075" m="3"/>
   <xacro:wheel name="right_front" r="0.20" ep="0.075" m="3"/>
   <xacro:wheel name="right_back" r="0.20" ep="0.075" m="3"/>
+
+
+  <link name="camera_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="0.005 0.005 0.005"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="0.005 0.005 0.005"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+
+  <gazebo reference="camera_link">
+    <sensor name="camera1" type="camera">
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <visualize>false</visualize>
+
+        <camera name="camera1">
+            <horizontal_fov>1</horizontal_fov>
+            <image>
+                <width>800</width>
+                <height>800</height>
+            </image>
+            <clip>
+                <near>0.02</near>
+                <far>300</far>
+            </clip>
+        </camera>
+        <plugin name="camera1_controller" filename="libgazebo_ros_camera.so">
+            <camera_name>camera1</camera_name>
+            <hack_baseline>0.07</hack_baseline>
+        </plugin>
+
+    </sensor>
+  </gazebo>
+
+  <joint name="catcher_to_cam0" type="fixed">
+    <parent link="catcher_5"/>
+    <child link="camera_link"/>
+    <origin rpy="0 1.57075 0" xyz="-0.375 0 0.475"/>
+    <axis xyz= "0 0 1"/>
+  </joint>
 
   <joint name="root_to_wheel_lf" type="continuous">
     <parent link="root_link"/>
@@ -298,49 +359,49 @@
     <limit effort="10" lower="-0.10" upper="0.0" velocity="0.5"/>
   </joint>
 
-  <gazebo>    
-  <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_diff_drive.so">
-    <ros>
-    </ros>
-
-    <!-- Update rate -->
-    <update_rate>500</update_rate>
-
-    <!-- Number of wheel pairs -->
-    <num_wheel_pairs>2</num_wheel_pairs>
-    
-    <left_joint>root_to_wheel_lf</left_joint>
-    <right_joint>root_to_wheel_rf</right_joint>
-    <left_joint>root_to_wheel_lb</left_joint>
-    <right_joint>root_to_wheel_rb</right_joint>
-
-    <!-- kinematics -->
-    <wheel_separation>0.55</wheel_separation>
-    <wheel_separation>0.55</wheel_separation>
-
-    <wheel_diameter>0.2</wheel_diameter>
-    <wheel_diameter>0.2</wheel_diameter>
-
-    <!-- limits -->
-    <max_wheel_torque>30</max_wheel_torque>
-    <max_wheel_acceleration>1.0</max_wheel_acceleration>
-
-    <!-- output -->
-    <publish_odom>true</publish_odom>
-    <publish_odom_tf>true</publish_odom_tf>
-    <publish_wheel_tf>true</publish_wheel_tf>
-
-    <odometry_frame>odom</odometry_frame>
-    <robot_base_frame>root_link</robot_base_frame>
-  </plugin>
-
-  <plugin name="gazebo_ros_force" filename="libgazebo_ros_force.so">
+  <gazebo>  
+    <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_diff_drive.so">
       <ros>
-        <remapping>gazebo_ros_force:=catcher_force</remapping>
       </ros>
-      <link_name>catcher_1</link_name>
-      <force_frame>world</force_frame>
+
+      <!-- Update rate -->
+      <update_rate>500</update_rate>
+
+      <!-- Number of wheel pairs -->
+      <num_wheel_pairs>2</num_wheel_pairs>
+      
+      <left_joint>root_to_wheel_lf</left_joint>
+      <right_joint>root_to_wheel_rf</right_joint>
+      <left_joint>root_to_wheel_lb</left_joint>
+      <right_joint>root_to_wheel_rb</right_joint>
+
+      <!-- kinematics -->
+      <wheel_separation>0.55</wheel_separation>
+      <wheel_separation>0.55</wheel_separation>
+
+      <wheel_diameter>0.2</wheel_diameter>
+      <wheel_diameter>0.2</wheel_diameter>
+
+      <!-- limits -->
+      <max_wheel_torque>10</max_wheel_torque>
+      <max_wheel_acceleration>0.5</max_wheel_acceleration>
+
+      <!-- output -->
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>true</publish_wheel_tf>
+
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>root_link</robot_base_frame>
     </plugin>
 
+    <plugin name="gazebo_ros_force" filename="libgazebo_ros_force.so">
+        <ros>
+          <remapping>gazebo_ros_force:=catcher_force</remapping>
+        </ros>
+        <link_name>catcher_1</link_name>
+        <force_frame>world</force_frame>
+    </plugin>
   </gazebo>
+
 </robot>
