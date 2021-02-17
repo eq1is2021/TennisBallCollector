@@ -9,14 +9,16 @@ import cv2
 from cv_bridge import CvBridge, CvBridgeError
 
 import math
+from rclpy.qos import qos_profile_sensor_data
 
 class Labeliser(Node):
 
     def __init__(self):
-        super().__init__('node_labelisation')
+        super().__init__('node_labelisation_balles')
         self.publisher_pose = self.create_publisher(PoseArray, 'balles_labels', 10)
         self.balles = self.create_subscription(PoseArray, 'balles_coords', self.balles_callback, 10)
-        self.sub_images = self.create_subscription(Image, '/zenith_camera/image_raw', self.image_callback, 10)
+        #https://answers.ros.org/question/361030/ros2-image-subscriber/
+        self.sub_images = self.create_subscription(Image, '/zenith_camera/image_raw', self.image_callback, qos_profile_sensor_data)
 
         self.bridge = CvBridge()
 
@@ -37,7 +39,8 @@ class Labeliser(Node):
             self.array_balles.poses.append(pose)   
 
         self.publisher_pose  # prevent unused variable warning
-        print("flag")
+        print("Node Labelisation des balles : Noeud lancé")
+        print("Node Labelisation des balles : Une fenêtre doit s'afficher")
 
     # Define a callback for the Image message
     def image_callback(self, img_msg):
@@ -121,7 +124,7 @@ class Labeliser(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    print("initialisation du node de tracking/labelisation")
+    print("Node Labelisation des balles : Initialisation du node de tracking/labelisation")
     labelise = Labeliser()
     rclpy.spin(labelise)
 
@@ -130,6 +133,8 @@ def main(args=None):
     # when the garbage collector destroys the node object)
     labelise.destroy_node()
     rclpy.shutdown()
+    
+    print("Node Labelisation des balles : Fin du programme de labelisation")
 
     cv2.destroyAllWindows()
 if __name__ == '__main__':
