@@ -220,6 +220,32 @@
     <xacro:fixed_joint elem1="${name}_4" elem2="${name}_aruco_11" />
   </xacro:macro>
 
+  <xacro:macro name="camera_xacro" params="name">
+  <link name="${name}">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="0.005 0.005 0.005"/>
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+    <box size="0.005 0.005 0.005"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+  </xacro:macro>
+
+
   <xacro:macro name="wheel" params="name ep r m">
     <link name="wheel_${name}">
     <visual>
@@ -267,32 +293,13 @@
   <xacro:wheel name="right_front" r="0.20" ep="0.15" m="3"/>
   <xacro:wheel name="right_back" r="0.20" ep="0.15" m="3"/>
 
-
-  <link name="camera_link">
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-    <box size="0.005 0.005 0.005"/>
-      </geometry>
-    </collision>
-
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-    <box size="0.005 0.005 0.005"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-
-    <inertial>
-      <mass value="1e-5" />
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
-    </inertial>
-  </link>
+  <xacro:camera_xacro name="camera1_link" />
+  <xacro:camera_xacro name="camera2_link" />
 
 
-  <gazebo reference="camera_link">
+
+
+  <gazebo reference="camera1_link">
     <sensor name="camera1" type="camera">
         <always_on>1</always_on>
         <update_rate>10</update_rate>
@@ -317,10 +324,42 @@
     </sensor>
   </gazebo>
 
-  <joint name="catcher_to_cam0" type="fixed">
+  <gazebo reference="camera2_link">
+    <sensor name="camera2" type="camera">
+        <always_on>1</always_on>
+        <update_rate>10</update_rate>
+        <visualize>true</visualize>
+
+        <camera name="camera2">
+            <horizontal_fov>1</horizontal_fov>
+            <image>
+                <width>800</width>
+                <height>800</height>
+            </image>
+            <clip>
+                <near>0.02</near>
+                <far>300</far>
+            </clip>
+        </camera>
+        <plugin name="camera2_controller" filename="libgazebo_ros_camera.so">
+            <camera_name>camera2</camera_name>
+            <hack_baseline>0.07</hack_baseline>
+        </plugin>
+
+    </sensor>
+  </gazebo>
+
+  <joint name="catcher_to_cam1" type="fixed">
     <parent link="catcher_5"/>
-    <child link="camera_link"/>
+    <child link="camera1_link"/>
     <origin rpy="0 1.57075 0" xyz="-0.375 0 0.475"/>
+    <axis xyz= "0 0 1"/>
+  </joint>
+
+  <joint name="catcher_to_cam2" type="fixed">
+    <parent link="catcher_5"/>
+    <child link="camera2_link"/>
+    <origin rpy="0 2 0" xyz="-0.525 0 0.475"/>
     <axis xyz= "0 0 1"/>
   </joint>
 
