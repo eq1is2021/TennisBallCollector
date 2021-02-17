@@ -257,12 +257,11 @@
 
 
   <xacro:bloc4 name="center" x="0.0" y="0.0" z="0.175" l1="0.8" l2="0.4" h="0.4" ep="0.05" m="15" />
-  <xacro:bloc5 name="catcher" x="-0.375" y="0.0" z="0.175" l="0.275" h="0.3" ep="0.01" m="0.1" />
-  <xacro:wheel name="left_front" r="0.20" ep="0.075" m="2"/>
-  <xacro:wheel name="left_back" r="0.20" ep="0.075" m="2"/>
-  <xacro:wheel name="right_front" r="0.20" ep="0.075" m="2"/>
-  <xacro:wheel name="right_back" r="0.20" ep="0.075" m="2"/>
-
+  <xacro:bloc5 name="catcher" x="-0.375" y="0.0" z="0.175" l="0.275" h="0.3" ep="0.01" m="3" />
+  <xacro:wheel name="left_front" r="0.20" ep="0.075" m="3"/>
+  <xacro:wheel name="left_back" r="0.20" ep="0.075" m="3"/>
+  <xacro:wheel name="right_front" r="0.20" ep="0.075" m="3"/>
+  <xacro:wheel name="right_back" r="0.20" ep="0.075" m="3"/>
 
   <joint name="root_to_wheel_lf" type="continuous">
     <parent link="root_link"/>
@@ -323,7 +322,7 @@
     <wheel_diameter>0.2</wheel_diameter>
 
     <!-- limits -->
-    <max_wheel_torque>20</max_wheel_torque>
+    <max_wheel_torque>30</max_wheel_torque>
     <max_wheel_acceleration>1.0</max_wheel_acceleration>
 
     <!-- output -->
