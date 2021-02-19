@@ -62,7 +62,7 @@ class Ctrl : public rclcpp::Node
       {
       	//std::cout <<"No cmd"<< std::endl;
       	msg_mvt_vide.linear.x = 0.;
-		msg_mvt_vide.angular.z = 0.75*atan(sawtooth(objective_yaw- current_yaw));
+		msg_mvt_vide.angular.z = 3.*atan(sawtooth(objective_yaw- current_yaw));
       	publisher_mvt->publish(msg_mvt_vide);
       }
     }
@@ -86,7 +86,7 @@ class Ctrl : public rclcpp::Node
     {
     	objective_yaw = msg->angular.z;
     	msg_mvt.linear.x = std::max(-0.5,std::min(0.5,msg->linear.x));
-    	msg_mvt.angular.z = 0.75*atan(sawtooth(objective_yaw- current_yaw));
+    	msg_mvt.angular.z = 3.*atan(sawtooth(objective_yaw- current_yaw));
     	//std::cout << current_yaw*180./M_PI <<" "<<sawtooth(msg->angular.z - current_yaw)*180./M_PI << std::endl;
  		last_msg_cmd = rclcpp::Clock().now();
     }
