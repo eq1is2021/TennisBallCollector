@@ -111,15 +111,16 @@ class DetectionBalles : public rclcpp::Node
 		
 			}
 
-			for (int i = 0; i < boundRect.size(); i++){
+			//on renvoie toujours un tableau de taille 2
+			for (int i = 0; i < boundRect.size() and i < 2; i++){
 		        rectangle( I, boundRect[i].tl(), boundRect[i].br(), Scalar(10,123,255), 2 );
 
 		        float coords_x = 0.;
 		        float coords_y = 0.;
 
-		        int x_offset = 30;
-        		int y_offset = 683;
-        		float scale = 0.02481389578163772;
+		        float x_offset = 30.;
+        		float y_offset = 683.;
+        		double scale = 0.02481389578163772;
 
 				geometry_msgs::msg::Pose p;
 				if(boundRect[i].x < mask.cols/2.){
@@ -134,12 +135,20 @@ class DetectionBalles : public rclcpp::Node
 
 				p.position.x = (coords_x-x_offset)*scale;
 				p.position.y = -(coords_y-y_offset)*scale;
-				p.position.z = 0.;
+				p.position.z = 1;
 				
 				posearray.poses.push_back(p);
 				
 			}
-			imshow("Detection Joueur",I);
+			while(posearray.poses.size() < 2){
+				geometry_msgs::msg::Pose p;
+				p.position.x = 0;
+				p.position.y = 0;
+				p.position.z = 0;;
+				posearray.poses.push_back(p);
+			}
+
+			//imshow("Detection Joueur",I);
 			publisher_->publish(posearray);
 			waitKey(3);
 
