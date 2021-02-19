@@ -151,7 +151,7 @@ class Robot_Control(Node):
 
         self.subscription = self.create_subscription(
             Bool,
-            'ball_inside',
+            'catcher_up',
             self.ball_inside_callback,
             10)
 
@@ -185,7 +185,7 @@ class Robot_Control(Node):
 
     def ball_inside_callback(self, msg):
         #Booléen indiquant si on a une balle dans la cage ou pas
-        self.has_ball=msg.data
+        self.has_ball=not(msg.data)
 
     def get_ball_target_id(self):
         print("calling get_ball_target_id")
@@ -197,7 +197,7 @@ class Robot_Control(Node):
         for i in range(10):
             # Si la balle existe
             # print(self.pos_balle[i][2])
-            if self.pos_balle[i][2]>0:
+            if self.pos_balle[i][2]==1:
                 # print("testing ball: ",i)
                 # Poids de l'id
                 weight_id = ((10-i)/10)*2/3
@@ -314,6 +314,9 @@ class Robot_Control(Node):
         # self.commande_robot=command_objective(self.pos_robot,[self.objective_x,self.objective_y])
         objectif = Point()
         objectif.x, objectif.y, objectif.z = float(self.objective_x),float(self.objective_y),float(self.objective_z)
+        if(self.has_objective == False):
+            objectif.z = float(2.)
+
         self.publisher_.publish(objectif)
 
 def main(args=None):
