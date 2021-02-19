@@ -133,7 +133,7 @@ class DetectionBalles : public rclcpp::Node
 			  	circle(I, Point(coords_x, coords_y), 8, Scalar(0, 0, 255), FILLED, LINE_8 );
 
 				p.position.x = (coords_x-x_offset)*scale;
-				p.position.y = (coords_y-y_offset)*scale;
+				p.position.y = -(coords_y-y_offset)*scale;
 				p.position.z = 0.;
 				
 				posearray.poses.push_back(p);
