@@ -58,4 +58,4 @@ def generate_launch_description():
 		detection_joueurs_node, 
 		detection_balles_cage_node,
 		yaw_ctrl_node,
-		fake_imu])
+		fake_imu_node])
