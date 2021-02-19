@@ -27,6 +27,7 @@ def generate_launch_description():
     localisation_aruco_node = Node(package="localisation_aruco", executable="viewer")
     detection_joueurs_node = Node(package="detection_joueurs", executable="detection_joueurs")
     detection_balles_cage_node = Node(package="detection_balles_cage", executable="detection_balles_cage")
+    yaw_ctrl_node = Node(package="yaw_ctrl", node_executable="yaw_ctrl")
     #robot_control_node = Node(package="robot_control", executable="rbt_control")
 
 
@@ -39,6 +40,7 @@ def generate_launch_description():
         labelisation_balles_node, 
         localisation_aruco_node, 
         detection_joueurs_node, 
-        detection_balles_cage_node
+        detection_balles_cage_node,
+        yaw_ctrl_node
 
     ])
