@@ -21,8 +21,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(OpenCV REQUIRED)
-find_package(cv_bridge REQUIRED)
+find_package(nav_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -39,11 +38,14 @@ if(BUILD_TESTING)
 endif()
 
 add_executable(yaw_ctrl src/ctrl.cpp)
-ament_target_dependencies(yaw_ctrl rclcpp std_msgs geometry_msgs sensor_msgs OpenCV cv_bridge)
+ament_target_dependencies(yaw_ctrl rclcpp std_msgs geometry_msgs sensor_msgs)
+
+add_executable(fake_imu src/fake_imu.cpp)
+ament_target_dependencies(fake_imu rclcpp std_msgs geometry_msgs sensor_msgs nav_msgs)
 
 
 install(TARGETS
-  yaw_ctrl
+  yaw_ctrl fake_imu
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
