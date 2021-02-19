@@ -79,7 +79,7 @@ class FieldSubPub(Node):
         self.objective = array([[0.], [0.]])
         self.objective_status = 2
         self.players = [array([[5.], [5.]]), array([[25.], [5.]])]
-        self.avg_speed = 4
+        self.avg_speed = 0.3
 
         self.cst_V = self.const_V(self.position)
         self.current_V = self.cst_V + self.var_V(self.position)
@@ -127,7 +127,7 @@ class FieldSubPub(Node):
         else:
             cmd_msg.linear.x = 0.
             cmd_msg.angular.z = self.angle
-        self.publisher.publish(cmd_msg)
+        self.publisher_.publish(cmd_msg)
         self.draw_field()
 
     def const_V(self, p):
