@@ -30,7 +30,7 @@ def generate_launch_description():
     yaw_ctrl_node = Node(package="yaw_ctrl", node_executable="yaw_ctrl")
     fake_imu_node = Node(package="yaw_ctrl", node_executable="fake_imu")
     potential_field_node = Node(package="field_command", node_executable="field_command")
-    #robot_control_node = Node(package="robot_control", executable="rbt_control")
+    robot_control_node = Node(package="robot_control", executable="rbt_control")
 
 
 
@@ -45,6 +45,7 @@ def generate_launch_description():
         detection_balles_cage_node,
         yaw_ctrl_node,
         fake_imu_node,
-	potential_field_node
+	potential_field_node,
+	robot_control_node
 
     ])

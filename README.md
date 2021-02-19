@@ -48,6 +48,9 @@ Pour eloquent :
 Pour foxy (peut-être nécesssaire) :
 - ros-foxy-image-pipeline
 
+Librairie python à installer: 
+python3.6 -m pip install transforms3d
+
 ### Démarrer la simulation
 
 #### Pour démarrer la simulation et tous les noeuds :
@@ -97,6 +100,11 @@ ros2 run detection_balles_cage detection_balles_cage
 Pour démarrer le control du robot :
 ```
 ros2 run robot_control rbt_control
+```
+
+Pour démarrer la commande par champ de poteltiel du robot :
+```
+ros2 run field_command field_command
 ```
 
 ![gif](https://github.com/eq1is2021/TennisBallCollector/blob/master/gif1.gif)
