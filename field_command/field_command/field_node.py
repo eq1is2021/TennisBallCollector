@@ -3,7 +3,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Point, Twist, PoseArray
 from sensor_msgs.msg import Imu
-from numpy import array, cos, sin, sqrt, sign, cross, arange, meshgrid, pi, zeros
+from numpy import array, cos, sin, arctan2, sqrt, sign, cross, arange, meshgrid, pi, zeros
 from numpy.linalg import norm
 from transforms3d.euler import quat2euler
 import matplotlib.pyplot as plt
@@ -59,16 +59,18 @@ def model_objective(p, p_obj):
 
 def model_player(p, p_j):
     N1, N2 = p[0, 0] - p_j[0, 0], p[1, 0] - p_j[1, 0]
-    j_x = 100 * N1 / (N1**2 + N2**2)**(14/2)
-    j_y = 100 * N2 / (N1**2 + N2**2)**(14/2)
+    j_x = 100 * N1 / (N1**2 + N2**2)**(10/2)
+    j_y = 100 * N2 / (N1**2 + N2**2)**(10/2)
 
     return array([[j_x], [j_y]])
 
-def model_const(p_obj):
-    if p_obj[0, 0] < 15:
+def model_const(p, p_obj):
+    if (p_obj[0, 0] < 15) and (p[0, 0] > 15):
         return -1
-    else:
+    elif (p_obj[0, 0] > 15) and (p[0, 0] < 15):
         return 1
+    else:
+        return 0
 
 class FieldSubPub(Node):
 
@@ -79,7 +81,7 @@ class FieldSubPub(Node):
         self.objective = array([[0.], [0.]])
         self.objective_status = 2
         self.players = [array([[5.], [5.]]), array([[25.], [5.]])]
-        self.avg_speed = 0.3
+        self.avg_speed = 0.5
 
         self.cst_V = self.const_V(self.position)
         self.current_V = self.cst_V + self.var_V(self.position)
@@ -123,7 +125,7 @@ class FieldSubPub(Node):
                 cmd_msg.linear.x = self.avg_speed * d
             else:
                 cmd_msg.linear.x = self.avg_speed
-            cmd_msg.angular.z = arctan2(self.current_V[1, 0], self.current_V[0, 0])
+            cmd_msg.angular.z = arctan2((float)(self.current_V[1, 0]), (float)(self.current_V[0, 0]))
         else:
             cmd_msg.linear.x = 0.
             cmd_msg.angular.z = self.angle
@@ -162,7 +164,7 @@ class FieldSubPub(Node):
     def var_V(self, p):
         obj_x, obj_y = model_objective(p, self.objective)
         j_x, j_y = model_player(p, self.players[0]) + model_player(p, self.players[1])
-        const = model_const(self.objective)
+        const = model_const(p, self.objective)
 
         current_V_x = const + obj_x + j_x
         current_V_y = obj_y + j_y
