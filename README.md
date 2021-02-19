@@ -9,14 +9,12 @@ Ce dépôt propose une solution afin de récupérer les balles sur un terrain de
 ```
 cd src
 git clone https://github.com/{User}/TennisBallCollector.git
-
 ```
 
 Ensuite, compilation :
 ```
 cd ..
 colcon build --symlink-install
-
 ```
 
 #### Modification du bashrc :
