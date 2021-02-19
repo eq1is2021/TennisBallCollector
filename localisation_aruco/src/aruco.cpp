@@ -80,7 +80,7 @@ class MinimalSubscriber : public rclcpp::Node
 {
   public:
     MinimalSubscriber()
-    : Node("minimal_subscriber")
+    : Node("aruco")
     {
       // subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
       // "/zenith_camera/image_raw", 10, std::bind(&MinimalSubscriber::image_callback, this, _1));
