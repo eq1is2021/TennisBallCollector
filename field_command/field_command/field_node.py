@@ -3,10 +3,13 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Point, Twist, PoseArray
 from sensor_msgs.msg import Imu
-from numpy import array, cos, sin, sqrt, sign, cross, arange, meshgrid, zeros
+from numpy import array, cos, sin, sqrt, sign, cross, arange, meshgrid, pi, zeros
 from numpy.linalg import norm
 from transforms3d.euler import quat2euler
 import matplotlib.pyplot as plt
+
+def sawtooth(x):
+    return (x + pi) % (2 * pi) - pi
 
 def model_wall(p, p1, p2):
     def is_left(a, b, c):
@@ -75,7 +78,7 @@ class FieldSubPub(Node):
         self.angle = 0.
         self.objective = array([[0.], [0.]])
         self.objective_status = 2
-        self.players = [array([[5], [5]]), array([[25], [5]])]
+        self.players = [array([[5.], [5.]]), array([[25.], [5.]])]
         self.avg_speed = 4
 
         self.cst_V = self.const_V(self.position)
@@ -86,7 +89,7 @@ class FieldSubPub(Node):
         self.current_V_array = self.cst_V_array + self.array_var_V()
 
         self.publisher_ = self.create_publisher(Twist, '/cmd_yaw', 10)
-        timer_period = 0.1  # seconds
+        timer_period = 0.2  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         self.subscription1 = self.create_subscription(Point,'/robot_objective', self.objective_callback,10)
@@ -99,15 +102,17 @@ class FieldSubPub(Node):
         self.objective_status = msg.z
 
     def players_callback(self, msg):
-        self.players[0][0, 0], self.players[0][1, 0] = msg.poses[0].position.x, msg.poses[0].position.y
-        self.players[1][0, 0], self.players[1][1, 0] = msg.poses[1].position.x, msg.poses[1].position.y
+        if msg.poses[0].position.z == 1:
+            self.players[0][0, 0], self.players[0][1, 0] = msg.poses[0].position.x, msg.poses[0].position.y
+        if msg.poses[1].position.z == 1:
+            self.players[1][0, 0], self.players[1][1, 0] = msg.poses[1].position.x, msg.poses[1].position.y
+        print(self.players)
 
     def pos_callback(self, msg):
         self.position[0, 0], self.position[1 ,0] = msg.linear.x, msg.linear.y
 
     def ang_callback(self, msg):
-        self.angle = quat2euler([msg.orientation.w, msg.orientation.x, msg.orientation.y, msg.orientation.z])[2]
-        print(self.angle)
+        self.angle = sawtooth(quat2euler([msg.orientation.w, msg.orientation.x, msg.orientation.y, msg.orientation.z])[2] - pi/2.)
 
     def timer_callback(self):
         self.current_V = self.const_V(self.position) + self.var_V(self.position)
@@ -123,7 +128,6 @@ class FieldSubPub(Node):
             cmd_msg.linear.x = 0.
             cmd_msg.angular.z = self.angle
         #self.publisher.publish(cmd_msg)
-        plt.clf()
         self.draw_field()
 
     def const_V(self, p):
@@ -138,13 +142,13 @@ class FieldSubPub(Node):
         Nwall7, Nwall8 = model_wall(p, p7, p8)
         p9, p10 = array([[15], [2.5]]), array([[15], [13.5]])
         Nwall9, Nwall10 = model_wall(p, p9, p10)
-        p11, p12 = array([[0], [13.5]]), array([[2], [13.5]])
+        p11, p12 = array([[0], [13.5]]), array([[1], [13.5]])
         Nwall11, Nwall12 = model_wall(p, p11, p12)
-        p13, p14 = array([[2.7], [14]]), array([[2.7], [16]])
+        p13, p14 = array([[2.7], [15]]), array([[2.7], [16]])
         Nwall13, Nwall14 = model_wall(p, p13, p14)
-        p15, p16 = array([[27.3], [0]]), array([[27.3], [2]])
+        p15, p16 = array([[27.3], [0]]), array([[27.3], [1]])
         Nwall15, Nwall16 = model_wall(p, p15, p16)
-        p17, p18 = array([[28], [2.5]]), array([[28], [2.5]])
+        p17, p18 = array([[29], [2.5]]), array([[29], [2.5]])
         Nwall17, Nwall18 = model_wall(p, p17, p18)
         # gestion du filet
         net_x_bot, net_y_bot = model_box(p, 13, 17, 1, 8, array([[0], [-1]]))
@@ -186,13 +190,14 @@ class FieldSubPub(Node):
     def draw_field(self):
         self.current_V_array = self.cst_V_array + self.array_var_V()
         R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
+        plt.cla()
         plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
         plt.plot(self.position[0, 0], self.position[1, 0], '.b')
-        plt.arrow(self.position[0, 0], self.position[1, 0], self.position[0, 0] + cos(self.angle), self.position[1, 0] + sin(self.angle), color='b')
+        plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
         plt.plot(self.objective[0, 0], self.objective[1, 0], '.g')
         plt.plot(self.players[0][0, 0], self.players[0][1, 0], '.r')
         plt.plot(self.players[1][0, 0], self.players[1][1, 0], '.r')
-        plt.pause(0.0001)
+        plt.pause(0.1)
 
 def main(args=None):
     plt.figure()
