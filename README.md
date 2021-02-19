@@ -54,7 +54,7 @@ Pour foxy (peut-être nécesssaire) :
 
 #### Pour démarrer la simulation et tous les noeuds :
 ```
-ros2 launch tennis_court launcher.launch.py
+ros2 launch robot_control launcher.launch.py
 ```
 
 #### Pour démarrer chaque noeud séparément
