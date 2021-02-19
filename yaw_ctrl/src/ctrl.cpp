@@ -95,7 +95,7 @@ class Ctrl : public rclcpp::Node
 
     void callback_cmd_catcher(const geometry_msgs::msg::Twist::SharedPtr msg) const
     {
-    	msg_mvt.linear.x = std::max(-0.5,std::min(0.5,msg->linear.x));
+    	msg_mvt_catcher.linear.x = std::max(-0.5,std::min(0.5,msg->linear.x));
     	msg_mvt_catcher.angular.z = msg->angular.z;
 		last_msg_cmd_catcher = rclcpp::Clock().now();
     }

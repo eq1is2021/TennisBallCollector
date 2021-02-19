@@ -99,6 +99,8 @@ Pour démarrer le control du robot :
 ros2 run robot_control rbt_control
 ```
 
+![gif](https://github.com/eq1is2021/TennisBallCollector/blob/master/gif1.gif)
+
 ## Groupe
 
 ### Membres
