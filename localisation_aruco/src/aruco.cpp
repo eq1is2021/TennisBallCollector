@@ -1,4 +1,4 @@
-#include <iostream>
+  #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -29,14 +29,14 @@ cv::Mat distCoeffs = (Mat_<double>(5,1) << 0, 0, 0, 0, 0);
 std::vector<int> markerIds;
 std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
 cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
-float marker_length = 0.17;
+float marker_length = 0.42;//0.17;
 cv::Mat rot_mat(3, 3, cv::DataType<float>::type);
 
 float x_marker =-1;
 float y_marker = -1; 
 float yaw_marker =  -1;
 
-bool display = false;
+bool display = true;
 
 
 // Checks if a matrix is a valid rotation matrix.
@@ -135,8 +135,9 @@ class MinimalSubscriber : public rclcpp::Node
           cout << "yaw_marker  " <<yaw_marker*180/3.1415 << endl;
 
           auto message = geometry_msgs::msg::Twist();
-          message.linear.x = -x_marker + 7.92;
-          message.linear.y = (y_marker + 3.18);
+          message.linear.x = -x_marker + 15.0; //-x_marker + 7.92;
+          message.linear.y = y_marker + 8.0; //(y_marker + 3.18);
+          std::cout << "TEST X: " << message.linear.x << " Y : " << message.linear.y << std::endl;
           message.linear.z = 0;
           message.angular.x = 0;
           message.angular.y = 0;
