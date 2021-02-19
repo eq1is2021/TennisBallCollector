@@ -50,17 +50,17 @@ class Ctrl : public rclcpp::Node
     {
       if((rclcpp::Clock().now() - last_msg_cmd_catcher).seconds() < 0.2)
       {
-      	std::cout <<"Mode catcher"<< std::endl;
+      	//std::cout <<"Mode catcher"<< std::endl;
 		publisher_mvt->publish(msg_mvt_catcher);
       }
       else if((rclcpp::Clock().now() - last_msg_cmd).seconds() < 0.2)
       {
-      	std::cout <<"Mode yaw"<< std::endl;
+      	//std::cout <<"Mode yaw"<< std::endl;
 		publisher_mvt->publish(msg_mvt);
       }
       else
       {
-      	std::cout <<"No cmd"<< std::endl;
+      	//std::cout <<"No cmd"<< std::endl;
       	msg_mvt_vide.linear.x = 0.;
 		msg_mvt_vide.angular.z = 0.75*atan(sawtooth(objective_yaw- current_yaw));
       	publisher_mvt->publish(msg_mvt_vide);
