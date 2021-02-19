@@ -83,13 +83,14 @@ class FieldSubPub(Node):
 
         self.cst_V = self.const_V(self.position)
         self.current_V = self.cst_V + self.var_V(self.position)
-        self.Mx, self.My = arange(0, 30, 0.5), arange(0, 15, 0.3)
+        self.Mx, self.My = arange(0, 30, 0.5), arange(0, 16, 0.3)
         self.X, self.Y = meshgrid(self.Mx, self.My)
         self.cst_V_array = self.array_const_V()
-        self.current_V_array = self.cst_V_array + self.array_var_V()
+        var = self.array_var_V()
+        self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
 
         self.publisher_ = self.create_publisher(Twist, '/cmd_yaw', 10)
-        timer_period = 0.2  # seconds
+        timer_period = 0.1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         self.subscription1 = self.create_subscription(Point,'/robot_objective', self.objective_callback,10)
@@ -106,7 +107,6 @@ class FieldSubPub(Node):
             self.players[0][0, 0], self.players[0][1, 0] = msg.poses[0].position.x, msg.poses[0].position.y
         if msg.poses[1].position.z == 1:
             self.players[1][0, 0], self.players[1][1, 0] = msg.poses[1].position.x, msg.poses[1].position.y
-        print(self.players)
 
     def pos_callback(self, msg):
         self.position[0, 0], self.position[1 ,0] = msg.linear.x, msg.linear.y
@@ -127,7 +127,7 @@ class FieldSubPub(Node):
         else:
             cmd_msg.linear.x = 0.
             cmd_msg.angular.z = self.angle
-        #self.publisher.publish(cmd_msg)
+        self.publisher.publish(cmd_msg)
         self.draw_field()
 
     def const_V(self, p):
@@ -142,13 +142,13 @@ class FieldSubPub(Node):
         Nwall7, Nwall8 = model_wall(p, p7, p8)
         p9, p10 = array([[15], [2.5]]), array([[15], [13.5]])
         Nwall9, Nwall10 = model_wall(p, p9, p10)
-        p11, p12 = array([[0], [13.5]]), array([[1], [13.5]])
+        p11, p12 = array([[0], [13.5]]), array([[1.5], [13.5]])
         Nwall11, Nwall12 = model_wall(p, p11, p12)
-        p13, p14 = array([[2.7], [15]]), array([[2.7], [16]])
+        p13, p14 = array([[2.7], [14.5]]), array([[2.7], [16]])
         Nwall13, Nwall14 = model_wall(p, p13, p14)
-        p15, p16 = array([[27.3], [0]]), array([[27.3], [1]])
+        p15, p16 = array([[27.3], [0]]), array([[27.3], [1.5]])
         Nwall15, Nwall16 = model_wall(p, p15, p16)
-        p17, p18 = array([[29], [2.5]]), array([[29], [2.5]])
+        p17, p18 = array([[28.5], [2.5]]), array([[30], [2.5]])
         Nwall17, Nwall18 = model_wall(p, p17, p18)
         # gestion du filet
         net_x_bot, net_y_bot = model_box(p, 13, 17, 1, 8, array([[0], [-1]]))
@@ -188,19 +188,24 @@ class FieldSubPub(Node):
         return VX, VY
 
     def draw_field(self):
-        self.current_V_array = self.cst_V_array + self.array_var_V()
+        var = self.array_var_V()
+        self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
         R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
         plt.cla()
+        plt.xlim((-2, 32))
+        plt.ylim((-2, 18))
         plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
         plt.plot(self.position[0, 0], self.position[1, 0], '.b')
         plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
         plt.plot(self.objective[0, 0], self.objective[1, 0], '.g')
         plt.plot(self.players[0][0, 0], self.players[0][1, 0], '.r')
         plt.plot(self.players[1][0, 0], self.players[1][1, 0], '.r')
-        plt.pause(0.1)
+        plt.pause(0.001)
 
 def main(args=None):
     plt.figure()
+    plt.xlim((-2, 32))
+    plt.ylim((-2, 18))
     rclpy.init(args=args)
 
     node_ = FieldSubPub()
