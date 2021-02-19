@@ -220,7 +220,7 @@
     <xacro:fixed_joint elem1="${name}_4" elem2="${name}_aruco_11" />
   </xacro:macro>
 
-  <xacro:macro name="camera_xacro" params="name">
+  <xacro:macro name="sensor_xacro" params="name">
   <link name="${name}">
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -293,8 +293,9 @@
   <xacro:wheel name="right_front" r="0.20" ep="0.15" m="3"/>
   <xacro:wheel name="right_back" r="0.20" ep="0.15" m="3"/>
 
-  <xacro:camera_xacro name="camera1_link" />
-  <xacro:camera_xacro name="camera2_link" />
+  <xacro:sensor_xacro name="camera1_link" />
+  <xacro:sensor_xacro name="camera2_link" />
+  <xacro:sensor_xacro name="imu_link" />
 
 
 
@@ -349,12 +350,39 @@
     </sensor>
   </gazebo>
 
+  <gazebo reference="imu_link">
+
+    <sensor name="imu0" type="imu">
+    <always_on>true</always_on>
+    <!-- Publish at 30 hz -->
+    <update_rate>30</update_rate>
+    <plugin name="imu0_plugin" filename="libgazebo_ros_imu_sensor.so">
+      <ros>
+        <!-- Will publish to /imu/data -->
+        <namespace>/imu</namespace>
+        <argument>~/out:=data</argument>
+      </ros>
+      <!-- frame_name ommited, will be "my_link" -->
+    </plugin>
+  </sensor>
+
+
+  </gazebo>
+
   <joint name="catcher_to_cam1" type="fixed">
     <parent link="catcher_5"/>
     <child link="camera1_link"/>
     <origin rpy="0 1.57075 0" xyz="-0.375 0 0.475"/>
     <axis xyz= "0 0 1"/>
   </joint>
+
+  <joint name="catcher_to_imu" type="fixed">
+    <parent link="catcher_5"/>
+    <child link="imu_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0.25"/>
+    <axis xyz= "0 0 1"/>
+  </joint>
+
 
   <joint name="catcher_to_cam2" type="fixed">
     <parent link="catcher_5"/>

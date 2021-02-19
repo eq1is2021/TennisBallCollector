@@ -48,10 +48,10 @@ class DetectionBalles : public rclcpp::Node
 {
   public:
     DetectionBalles()
-    : Node("node_detection")
+    : Node("node_detection_cage")
     {
     	publisher_ = this->create_publisher<std_msgs::msg::Bool>("/catcher_up", 10);
-    	publisher_mvt = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
+    	publisher_mvt = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel_catcher", 10);
     	
       	subscription_cam1 = this->create_subscription<sensor_msgs::msg::Image>("/camera1/image_raw", rclcpp::SensorDataQoS(), std::bind(&DetectionBalles::image_callback_cam1, this, _1));
     	subscription_cam2 = this->create_subscription<sensor_msgs::msg::Image>("/camera2/image_raw", rclcpp::SensorDataQoS(), std::bind(&DetectionBalles::image_callback_cam2, this, _1));
@@ -144,13 +144,12 @@ class DetectionBalles : public rclcpp::Node
     					msg_mvt.angular.z = 0.2*atan((centers[i].x - 400.)/400.);
 					}
 					isClose = true;
+					publisher_mvt->publish(msg_mvt);
 
 			    }
 			    else
 			    {
 			    	isClose = false;
-			    	msg_mvt.linear.x = 0.;
-    				msg_mvt.angular.z = 0.;
 			    }
 
 
@@ -158,7 +157,7 @@ class DetectionBalles : public rclcpp::Node
 
 
 			publisher_->publish(msg_catcher_up);
-			publisher_mvt->publish(msg_mvt);
+
 			
 			//imshow("Entrée",I);
 			waitKey(3);
@@ -249,18 +248,14 @@ class DetectionBalles : public rclcpp::Node
 						    //std::cout << (centers[i].x - 400.)/400. << " " << (centers[i].y -400.)/400.<< std::endl;
 						    msg_mvt.linear.x = 0.3*atan((centers[i].y)/800.);
 	    					msg_mvt.angular.z = 0.2*atan((centers[i].x - 400.)/400.);
+	    					publisher_mvt->publish(msg_mvt);
 						}
-				    }
-				    else
-				    {
-				    	msg_mvt.linear.x = 0.;
-	    				msg_mvt.angular.z = 0.;
 				    }
 
 				}
 
 
-					publisher_mvt->publish(msg_mvt);
+
 
 
 				//imshow("Entrée",I);
