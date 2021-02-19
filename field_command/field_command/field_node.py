@@ -103,10 +103,11 @@ class FieldSubPub(Node):
         self.players[1][0, 0], self.players[1][1, 0] = msg.poses[1].position.x, msg.poses[1].position.y
 
     def pos_callback(self, msg):
-        self.position[0, 0], self.position[1 ,0] = msg.position.x, msg.position.y
+        self.position[0, 0], self.position[1 ,0] = msg.linear.x, msg.linear.y
 
     def ang_callback(self, msg):
         self.angle = quat2euler([msg.orientation.w, msg.orientation.x, msg.orientation.y, msg.orientation.z])[2]
+        print(self.angle)
 
     def timer_callback(self):
         self.current_V = self.const_V(self.position) + self.var_V(self.position)
@@ -191,6 +192,7 @@ class FieldSubPub(Node):
         plt.plot(self.objective[0, 0], self.objective[1, 0], '.g')
         plt.plot(self.players[0][0, 0], self.players[0][1, 0], '.r')
         plt.plot(self.players[1][0, 0], self.players[1][1, 0], '.r')
+        plt.pause(0.0001)
 
 def main(args=None):
     plt.figure()
@@ -201,7 +203,6 @@ def main(args=None):
 
     node_.destroy_node()
     rclpy.shutdown()
-    plt.show()
 
 
 if __name__ == '__main__':
