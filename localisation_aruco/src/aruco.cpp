@@ -36,6 +36,8 @@ float x_marker =-1;
 float y_marker = -1; 
 float yaw_marker =  -1;
 
+bool display = false;
+
 
 // Checks if a matrix is a valid rotation matrix.
 bool isRotationMatrix(Mat &R)
@@ -104,6 +106,7 @@ class MinimalSubscriber : public rclcpp::Node
     		frame.copyTo(frameCopy);
 
       //Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
+      //detectorParams->cornerRefinementMethod = aruco::CORNER_REFINE_SUBPIX;
       //params->doCornerRefinement = true;
 
     	// detection du marker 0
@@ -140,9 +143,13 @@ class MinimalSubscriber : public rclcpp::Node
           message.angular.z = -atan2(sin(yaw_marker + 3*M_PI/2.),cos(yaw_marker + 3*M_PI/2.));
           publisher_->publish(message);
 
-    			imshow("Entrée",frameCopy);
+          if(display){
+    			    imshow("Entrée",frameCopy);
+          }
     		}else{
+          if(display){
 				  imshow("Entrée",frame);
+          }
 			  }
 			waitKey(3);
 		}
