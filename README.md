@@ -52,6 +52,12 @@ Pour foxy (peut-être nécesssaire) :
 
 ### Démarrer la simulation
 
+#### Pour démarrer la simulation et tous les noeuds :
+```
+ros2 launch tennis_court launcher.launch.py
+```
+
+#### Pour démarrer chaque noeud séparément
 Pour démarrer la simulation (le court de tennis seul) : 
 ```
 ros2 launch tennis_court tennis_court.launch.py
@@ -88,6 +94,11 @@ ros2 run detection_joueurs detection_joueurs
 Pour démarrer la préhension des balles (attrape les balles proches) :
 ```
 ros2 run detection_balles_cage detection_balles_cage
+```
+
+Pour démarrer le control du robot :
+```
+ros2 run robot_control rbt_control
 ```
 
 ## Groupe
