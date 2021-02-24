@@ -221,7 +221,7 @@ class FieldSubPub(Node):
         obj_color = 'g' if self.objective_status !=2 else 'k'
         current_dir = arctan2(self.current_V[1, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2), self.current_V[0, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2))[0]
         plt.arrow(self.position[0, 0], self.position[1, 0], cos(current_dir), sin(current_dir), color=obj_color)
-        plt.plot(self.objective[0, 0], self.objective[1, 0], color=obj_color)
+        plt.plot(self.objective[0, 0], self.objective[1, 0], color=obj_color, linestyle='dotted')
         text = '('+ str(round(self.objective[0, 0], 1)) + '|' + str(round(self.objective[1, 0], 1)) + ')'
         plt.text(self.objective[0, 0], self.objective[1, 0], text, fontsize=12, color = obj_color)
         #players
