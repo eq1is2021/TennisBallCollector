@@ -37,9 +37,9 @@ def model_wall(p, p1, p2):
     d = norm(cross(BA.flatten(), u.flatten())) / norm(u)
 
     if is_in_box(p1, p2, p) and (is_left(p, p1, p2) == 1):
-        res = (1/d**3) * ng #+ ((p-p1) / norm(p-p1) ** 3 + (p-p2) / norm(p-p2) ** 3)
+        res = (1.5/d**3) * ng #+ ((p-p1) / norm(p-p1) ** 3 + (p-p2) / norm(p-p2) ** 3)
     elif is_in_box(p1, p2, p) and (is_left(p, p1, p2) == -1):
-        res = (1/d**3) * nd #+ ((p-p1) / norm(p-p1) ** 3 + (p-p2) / norm(p-p2) ** 3)
+        res = (1.5/d**3) * nd #+ ((p-p1) / norm(p-p1) ** 3 + (p-p2) / norm(p-p2) ** 3)
     else:
         res = array([[0], [0]]) #+ (p-p1) / norm(p-p1) ** 3 + (p-p2) / norm(p-p2) ** 3
 
@@ -60,8 +60,8 @@ def model_objective(p, p_obj):
 
 def model_player(p, p_j):
     N1, N2 = p[0, 0] - p_j[0, 0], p[1, 0] - p_j[1, 0]
-    j_x = 100 * N1 / (N1**2 + N2**2)**(4/2)
-    j_y = 100 * N2 / (N1**2 + N2**2)**(4/2)
+    j_x = 100 * N1 / (N1**2 + N2**2)**(6/2)
+    j_y = 100 * N2 / (N1**2 + N2**2)**(6/2)
 
     return array([[j_x], [j_y]])
 
@@ -155,13 +155,13 @@ class FieldSubPub(Node):
         Nwall7, Nwall8 = model_wall(p, p7, p8)
         p9, p10 = array([[15], [2.5]]), array([[15], [13.5]])
         Nwall9, Nwall10 = model_wall(p, p9, p10)
-        p11, p12 = array([[0], [13.5]]), array([[1.5], [13.5]])
+        p11, p12 = array([[0], [13.5]]), array([[1.], [13.5]])
         Nwall11, Nwall12 = model_wall(p, p11, p12)
-        p13, p14 = array([[2.7], [14.5]]), array([[2.7], [16]])
+        p13, p14 = array([[2.7], [15]]), array([[2.7], [16]])
         Nwall13, Nwall14 = model_wall(p, p13, p14)
-        p15, p16 = array([[27.3], [0]]), array([[27.3], [1.5]])
+        p15, p16 = array([[27.3], [0]]), array([[27.3], [1.]])
         Nwall15, Nwall16 = model_wall(p, p15, p16)
-        p17, p18 = array([[28.5], [2.5]]), array([[30], [2.5]])
+        p17, p18 = array([[29], [2.5]]), array([[30], [2.5]])
         Nwall17, Nwall18 = model_wall(p, p17, p18)
         # gestion du filet
         net_x_bot, net_y_bot = model_box(p, 13, 17, 1, 8, array([[0], [-1]]))
@@ -206,13 +206,13 @@ class FieldSubPub(Node):
         return VX, VY
 
     def draw_field(self):
-        #var = self.array_var_V()
-        #self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
-        #R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
+        var = self.array_var_V()
+        self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
+        R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
         plt.cla()
         plt.xlim((-2, 32))
         plt.ylim((-2, 18))
-        #plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
+        plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
         # robot        
         plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
         plt.plot(self.position[0, 0], self.position[1, 0], '.b')

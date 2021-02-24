@@ -22,10 +22,10 @@ goal_zone_left_x=2.7
 goal_zone_left_y=terrain_y-2.5
 goal_zone_right_x=terrain_x-2.7
 goal_zone_right_y=2.5
-goal_left_x=2
-goal_left_y=terrain_y-2
-goal_right_x=terrain_x-2
-goal_right_y=2
+goal_left_x=1.5
+goal_left_y=terrain_y-1.5
+goal_right_x=terrain_x-1.5
+goal_right_y=1.5
 
 #Fonction renvoyant la distance et l'angle entre le robot et une position (en prenant en compte l'angle du robot)
 def get_dist(pos_robot,pos_target):
