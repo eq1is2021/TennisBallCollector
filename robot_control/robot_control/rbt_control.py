@@ -320,24 +320,26 @@ class Robot_Control(Node):
                     self.has_objective = True
             else:
                 if self.num_balle > 0:
-                    if self.balle_target_id == -1:
-                        # On prends la balle avec le poids le plus élevé
-                        self.get_ball_target_id()
+                    self.get_ball_target_id()
                     print("Target Ball: ",self.balle_target_id)
-                    # Si le robot et la balle sont du même côté:
-                    # print("self.pos_robot[0]: ",self.pos_robot[0])
-                    # print("self.pos_balle[self.balle_target_id][0]: ",self.pos_balle[self.balle_target_id][0])
-                    if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id][0]):
-                        print("Robot and Ball in the same side")
-                        self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id][0],self.pos_balle[self.balle_target_id][1]
-                        self.has_objective = True
-                        # Le robot va chercher la balle
-                    else:
-                        # Sinon, le robot va vers le passage dans le mur le plus proche
-                        print("Robot and ball in different sides")
-                        self.objective_x,self.objective_y=get_passage_wall(self.pos_robot)
-                        self.objective_z = 1
-                        self.has_objective = True
+                    if self.balle_target_id >= 0:
+                        # Si le robot et la balle sont du même côté:
+                        # print("self.pos_robot[0]: ",self.pos_robot[0])
+                        # print("self.pos_balle[self.balle_target_id][0]: ",self.pos_balle[self.balle_target_id][0])
+                        if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id][0]):
+                            self.get_logger().error("Robot and Ball in the same side")
+                            print("Robot and Ball in the same side")
+                            self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id][0],self.pos_balle[self.balle_target_id][1]
+                            self.get_logger().error("self.pos_balle[self.balle_target_id]: ")
+                            self.get_logger().error(str(self.pos_balle[self.balle_target_id]))
+                            self.has_objective = True
+                            # Le robot va chercher la balle
+                        else:
+                            # Sinon, le robot va vers le passage dans le mur le plus proche
+                            print("Robot and ball in different sides")
+                            self.objective_x,self.objective_y=get_passage_wall(self.pos_robot)
+                            self.objective_z = 1
+                            self.has_objective = True
         # Enfin, on envoie la commande du robot
         # self.commande_robot=command_objective(self.pos_robot,[self.objective_x,self.objective_y])
         objectif = Point()
