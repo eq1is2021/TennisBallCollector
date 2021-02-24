@@ -1,33 +1,34 @@
-# Debrief du xx/xx/xxxx
+# Debrief du 24/03/2021
 
-PO: ...
+PO: Robin Sanchez
 
 
 ## Bilan
 
-Pourcentage de tâches réalisées: ... %
+Pourcentage de tâches réalisées: 80 %
 
 ### Ce qui a fonctionné
 
-###### A compléter.
-
+* Amélioration du gestionnaire d'objectif
+* Le robot a récupéré 7 balles
+* Ajout d'un récepteur GNSS
 
 ### Ce qui n'a pas fonctionné
-
-###### A compléter.
+* La localisation visuelle a été abandonnée car non fonctionnelle sur les bords du terrain
+* La solution des champs de potentiel reste très sensible à de nombreux réglages.
 
 
 ### Retour d'expérience du PO
+* On a cherché à assembler les travail de tous et à optimiser nos noeuds.
+* Chacun a apporté des modifications de dernière minute à son travail.
+* Faire attention à ne pas accepter plusieurs PR de modifications de dernière minute en même temps afin de pouvoir les debugger.
 
-###### A compléter.
 
 
 ### Conseils pour le prochain PO
-
-###### A compléter.
+* Avantage d'être le dernier PO.
 
 
 
 ## Nouvelles mesures
-
-###### A compléter avec les nouvelles mesures prises pour répondre aux problèmes rencontrées par l'équipe pendant le sprint. Ces mesures peuvent aller d'une convention de nommage à un changement radical dans la construction du robot, ou encore un flow spécifique de travail.
+* Néant
