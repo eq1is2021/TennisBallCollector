@@ -60,8 +60,8 @@ def model_objective(p, p_obj):
 
 def model_player(p, p_j):
     N1, N2 = p[0, 0] - p_j[0, 0], p[1, 0] - p_j[1, 0]
-    j_x = 100 * N1 / (N1**2 + N2**2)**(10/2)
-    j_y = 100 * N2 / (N1**2 + N2**2)**(10/2)
+    j_x = 100 * N1 / (N1**2 + N2**2)**(8/2)
+    j_y = 100 * N2 / (N1**2 + N2**2)**(8/2)
 
     return array([[j_x], [j_y]])
 
@@ -122,13 +122,13 @@ class FieldSubPub(Node):
         cmd_msg = Twist()
         if self.objective_status in [0, 1]:
             d = sqrt((self.objective[0, 0] - self.position[0, 0])**2 + (self.objective[1, 0] - self.position[1, 0])**2)
-            if d < 1:
-                cmd_msg.linear.x = self.avg_speed * d
+            if d < 1.5:
+                cmd_msg.linear.x = self.avg_speed * d**2
             else:
                 cmd_msg.linear.x = self.avg_speed
             cmd_msg.angular.z = arctan2((float)(self.current_V[1, 0]), (float)(self.current_V[0, 0]))
         else:
-            cmd_msg.linear.x = 0.
+            cmd_msg.linear.x = self.avg_speed
             cmd_msg.angular.z = self.angle
         self.publisher_.publish(cmd_msg)
         self.draw_field()
@@ -163,9 +163,14 @@ class FieldSubPub(Node):
         return array([[const_V_x], [const_V_y]])
 
     def var_V(self, p):
-        obj_x, obj_y = model_objective(p, self.objective)
-        j_x, j_y = model_player(p, self.players[0]) + model_player(p, self.players[1])
-        const = model_const(p, self.objective)
+        if self.objective_status != 2:
+            obj_x, obj_y = model_objective(p, self.objective)
+            j_x, j_y = model_player(p, self.players[0]) + model_player(p, self.players[1])
+            const = model_const(p, self.objective) 
+        else:
+            obj_x, obj_y = array([[0.], [0.]])
+            j_x, j_y = model_player(p, self.players[0]) + model_player(p, self.players[1])
+            const = 0.
 
         current_V_x = const + obj_x + j_x
         current_V_y = obj_y + j_y
@@ -198,14 +203,18 @@ class FieldSubPub(Node):
         plt.xlim((-2, 32))
         plt.ylim((-2, 18))
         #plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
-        #print("hello")
-        #current_dir = arctan2(self.current_V[1, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2), self.current_V[0, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2))
-        #print(current_dir)
-        #plt.arrow(self.position[0, 0], self.position[1, 0], cos(current_dir), sin(current_dir), color='g')
+        # robot        
         plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
         plt.plot(self.position[0, 0], self.position[1, 0], '.b')
         plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
-        plt.plot(self.objective[0, 0], self.objective[1, 0], '.g')
+        #objective
+        obj_color = 'g' if self.objective_status !=2 else 'k'
+        current_dir = arctan2(self.current_V[1, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2), self.current_V[0, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2))[0]
+        plt.arrow(self.position[0, 0], self.position[1, 0], cos(current_dir), sin(current_dir), color=obj_color)
+        plt.plot(self.objective[0, 0], self.objective[1, 0], color=obj_color)
+        text = '('+ str(round(self.objective[0, 0], 1)) + '|' + str(round(self.objective[1, 0], 1)) + ')'
+        plt.text(self.objective[0, 0], self.objective[1, 0], text, fontsize=12, color = obj_color)
+        #players
         plt.plot(self.players[0][0, 0], self.players[0][1, 0], '.r')
         plt.plot(self.players[1][0, 0], self.players[1][1, 0], '.r')
         plt.gcf().canvas.draw_idle()
