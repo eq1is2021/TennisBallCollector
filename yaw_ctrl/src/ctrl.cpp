@@ -88,7 +88,12 @@ class Ctrl : public rclcpp::Node
     {
     	objective_yaw = msg->angular.z;
     	msg_mvt.linear.x = std::max(-0.5,std::min(0.5,msg->linear.x));
-    	msg_mvt.angular.z = spd_rot*atan(sawtooth(objective_yaw- current_yaw));
+    	double delta = sawtooth(objective_yaw- current_yaw);
+    	msg_mvt.angular.z = spd_rot*atan(delta);
+    	if(abs(delta)*180./M_PI > 120)
+    	{
+    		msg_mvt.linear.x = 0.;
+    	}
     	//std::cout << current_yaw*180./M_PI <<" "<<sawtooth(msg->angular.z - current_yaw)*180./M_PI << std::endl;
  		last_msg_cmd = rclcpp::Clock().now();
     }
