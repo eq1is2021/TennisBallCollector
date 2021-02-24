@@ -131,9 +131,11 @@ class Labeliser(Node):
                 else :
                     #balle pas trouvée, on l'ajoute dans la liste
                     pose = Pose() 
-                    pose.position.x, pose.position.y, pose.position.z = 0., 0., 0.
+                    pose.position = msg.poses[i].position
+                    pose.position.z = 2.
                     self.array_balles.poses.append(pose)
         self.send_balles() 
+
 
     def send_balles(self):
         msg = PoseArray() 
@@ -141,11 +143,12 @@ class Labeliser(Node):
         y_offset = 683
         scale = 0.02481389578163772
         for i in range(len(self.array_balles.poses)):
-            pose = Pose() 
-            pose.position.x = (self.array_balles.poses[i].position.x-x_offset)*scale
-            pose.position.y = (-self.array_balles.poses[i].position.y+y_offset)*scale
-            pose.position.z = self.array_balles.poses[i].position.z
-            msg.poses.append(pose)
+            if(self.array_balles.poses[i].position.z == 1.):
+                pose = Pose() 
+                pose.position.x = (self.array_balles.poses[i].position.x-x_offset)*scale
+                pose.position.y = (-self.array_balles.poses[i].position.y+y_offset)*scale
+                pose.position.z = self.array_balles.poses[i].position.z
+                msg.poses.append(pose)
 
 
         while(len(msg.poses) < 10):
