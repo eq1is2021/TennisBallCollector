@@ -60,8 +60,8 @@ def model_objective(p, p_obj):
 
 def model_player(p, p_j):
     N1, N2 = p[0, 0] - p_j[0, 0], p[1, 0] - p_j[1, 0]
-    j_x = 100 * N1 / (N1**2 + N2**2)**(8/2)
-    j_y = 100 * N2 / (N1**2 + N2**2)**(8/2)
+    j_x = 100 * N1 / (N1**2 + N2**2)**(4/2)
+    j_y = 100 * N2 / (N1**2 + N2**2)**(4/2)
 
     return array([[j_x], [j_y]])
 
@@ -82,7 +82,7 @@ class FieldSubPub(Node):
         self.objective = array([[0.], [0.]])
         self.objective_status = 2
         self.players = [array([[5.], [5.]]), array([[25.], [5.]])]
-        self.avg_speed = 1.0
+        self.avg_speed = 2.0
 
         self.cst_V = self.const_V(self.position)
         self.current_V = self.cst_V + self.var_V(self.position)
@@ -98,7 +98,7 @@ class FieldSubPub(Node):
 
         self.subscription1 = self.create_subscription(Point,'/robot_objective', self.objective_callback,10)
         self.subscription2 = self.create_subscription(PoseArray,'/joueurs_coords', self.players_callback,10)
-        self.subscription3 = self.create_subscription(Twist,'/aruco_twist', self.pos_callback,10)
+        self.subscription3 = self.create_subscription(Twist,'/gnss_twist', self.pos_callback,10)
         self.subscription4 = self.create_subscription(Imu,'/imu/data', self.ang_callback,10)
 
     def objective_callback(self, msg):
@@ -122,8 +122,10 @@ class FieldSubPub(Node):
         cmd_msg = Twist()
         if self.objective_status in [0, 1]:
             d = sqrt((self.objective[0, 0] - self.position[0, 0])**2 + (self.objective[1, 0] - self.position[1, 0])**2)
-            if d < 1.5:
+            if d < 1.:
                 cmd_msg.linear.x = self.avg_speed * d**2
+            elif d < 0.3:
+                cmd_msg.linear.x = 0.
             else:
                 cmd_msg.linear.x = self.avg_speed
             cmd_msg.angular.z = arctan2((float)(self.current_V[1, 0]), (float)(self.current_V[0, 0]))
