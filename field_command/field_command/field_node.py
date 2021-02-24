@@ -169,7 +169,7 @@ class FieldSubPub(Node):
         
         p11, p12 = array([[0], [13.5]]), array([[1], [13.5]])
         Nwall11, Nwall12 = model_wall(p, p11, p12)
-        p13, p14 = array([[2.7], [15]]), array([[2.7], [15]])
+        p13, p14 = array([[2.7], [15]]), array([[2.7], [16]])
         Nwall13, Nwall14 = model_wall(p, p13, p14)
         p15, p16 = array([[27.3], [0]]), array([[27.3], [1.]])
         Nwall15, Nwall16 = model_wall(p, p15, p16)
