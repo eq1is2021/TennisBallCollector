@@ -110,7 +110,7 @@ def test_ball_near(pos_robot,pos_balle,d):
 
 def test_ball_wall(pos_balle):
     #Fonction de test pour voir si une balle est proche du mur. Return True si la balle est loin du mur et on peut la prendre, False si elle est proche du mur
-    d_t=1
+    d_t=0.4
     if (pos_balle[0]<d_t) or (pos_balle[0]>terrain_x-d_t):
         return False
     if (pos_balle[1]<d_t) or (pos_balle[1]>terrain_y-d_t):
@@ -221,8 +221,8 @@ class Robot_Control(Node):
             # Si la balle existe
             # print(self.pos_balle[i][2])
             if self.pos_balle[i][2]==1 and test_ball_wall(self.pos_balle[i]):
-                self.get_logger().error("self.pos_balle[i]: ")
-                self.get_logger().error(str(self.pos_balle[i]))
+                # self.get_logger().error("self.pos_balle[i]: ")
+                # self.get_logger().error(str(self.pos_balle[i]))
                 # print("testing ball: ",i)
                 # Poids de l'id
                 weight_id = ((10-i)/10)*2/3
@@ -239,9 +239,9 @@ class Robot_Control(Node):
                 if weight_ball > weight:
                     weight = weight_ball
                     self.balle_target_id = i
-                    self.get_logger().error("self.balle_target_id: ")
-                    self.get_logger().error(str(self.balle_target_id))
-                    print("self.balle_target_id: ",self.balle_target_id)
+                    # self.get_logger().error("self.balle_target_id: ")
+                    # self.get_logger().error(str(self.balle_target_id))
+                    # print("self.balle_target_id: ",self.balle_target_id)
                 # En sortie de boucle, on a donc l'id de la balle avec le poids le plus élevé
 
     def control_callback(self):
@@ -252,7 +252,7 @@ class Robot_Control(Node):
         self.balle_target_id = -1
         # Si le robot a une balle dans son panier
         if self.has_ball:
-            print("Has Ball")
+            # print("Has Ball")
             # Partie commentée: une seule balle à la fois, on ne peut pas en prendre plusieurs
             # # On regarde si il y a une balle tout près
             # for i in range(10):
@@ -267,76 +267,77 @@ class Robot_Control(Node):
             if test_lr(self.pos_robot[0]) == "left":
                 print("Robot - Left")
                 if test_goal(self.pos_robot):
-                    print("Inside Goal Zone - Stop")
+                    # print("Inside Goal Zone - Stop")
                     self.objective_x,self.objective_y = 0,0
                     self.objective_z = 2
                     self.has_objective = True
                 else:
                     if test_goal_zone(self.pos_robot) or self.goal_status: # S'il est dans la zone d'entrée du but, ou s'il est en train d'aller vers le but, il va vers le but
-                        print("Moving Toward Goal")
+                        # print("Moving Toward Goal")
                         self.objective_x,self.objective_y = goal_left_x,goal_left_y
                         self.objective_z = 1
                         self.goal_status = True
                         self.has_objective = True
                     else: #Sinon, il se dirige vers la zone d'entrée de but
-                        print("Moving Toward Goal Entry Zone")
+                        # print("Moving Toward Goal Entry Zone")
                         self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
                         self.objective_z = 1
                         self.has_objective = True
             else:
-                print("Robot - Right")
+                # print("Robot - Right")
                 if test_goal(self.pos_robot):
-                    print("Inside Goal Zone")
+                    # print("Inside Goal Zone")
                     self.objective_x,self.objective_y = 0,0
                     self.objective_z = 2
                     self.has_objective = True
                 else:
                     if test_goal_zone(self.pos_robot) or self.goal_status:
-                        print("Moving Toward Goal")
+                        # print("Moving Toward Goal")
                         self.objective_x,self.objective_y = goal_right_x,goal_right_y
                         self.objective_z = 1
                         self.has_objective = True
                         self.goal_status = True
                     else:
-                        print("Moving Toward Goal Entry Zone")
+                        # print("Moving Toward Goal Entry Zone")
                         self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
                         self.objective_z = 1
                         self.has_objective = True
         else:
             # Si le robot n'a pas de balle, il ne doit pas aller vers le but de toute façon.
             self.goal_status = False
-            print("No Ball")
+            # print("No Ball")
             if test_goal(self.pos_robot):
-                print("Inside Goal")
+                # print("Inside Goal")
                 if test_lr(self.pos_robot[0]) == "left":
-                    print("Going Outside - Left")
+                    # print("Going Outside - Left")
                     self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
                     self.objective_z = 1
                     self.has_objective = True
                 else:
-                    print("Going Outside - Right")
+                    # print("Going Outside - Right")
                     self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
                     self.objective_z = 1
                     self.has_objective = True
             else:
                 if self.num_balle > 0:
                     self.get_ball_target_id()
-                    print("Target Ball: ",self.balle_target_id)
+                    # print("Target Ball: ",self.balle_target_id)
                     if self.balle_target_id >= 0:
                         # Si le robot et la balle sont du même côté:
                         # print("self.pos_robot[0]: ",self.pos_robot[0])
                         # print("self.pos_balle[self.balle_target_id][0]: ",self.pos_balle[self.balle_target_id][0])
                         if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id][0]):
-                            self.get_logger().error("Robot and Ball in the same side")
-                            print("Robot and Ball in the same side")
+                            # self.get_logger().error("Robot and Ball in the same side")
+                            # print("Robot and Ball in the same side")
                             self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id][0],self.pos_balle[self.balle_target_id][1]
-                            self.get_logger().error("self.pos_balle[self.balle_target_id]: ")
-                            self.get_logger().error(str(self.pos_balle[self.balle_target_id]))
+                            # self.get_logger().error("self.pos_balle[self.balle_target_id]: ")
+                            # self.get_logger().error(str(self.pos_balle[self.balle_target_id]))
+                            self.objective_z = 0
                             self.has_objective = True
                             # Le robot va chercher la balle
                         else:
                             # Sinon, le robot va vers le passage dans le mur le plus proche
-                            print("Robot and ball in different sides")
+                            # print("Robot and ball in different sides")
                             self.objective_x,self.objective_y=get_passage_wall(self.pos_robot)
                             self.objective_z = 1
                             self.has_objective = True
