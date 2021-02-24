@@ -10,6 +10,7 @@ PO: Robin Sanchez
 ## Tâches à réaliser
 * Règler les soucis d'offset dans la localisation : Agathe et Bertrand
 * Amélioration du gestionnaire de contrôle (éviter les balles proches des murs) : Alexandre
+* Amélioration du gestionnaire de contrôle (objectifs hors grille) : Alexandre et Bertrand
 * Règlage de la vitesse : Kévin et Robin
 
 ## Challenges techniques
