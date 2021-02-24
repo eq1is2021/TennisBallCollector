@@ -117,6 +117,17 @@ def test_ball_wall(pos_balle):
         return False
     if (wall_center_x-d_t<pos_balle[0]<wall_center_x+d_t) and (len_space-d_t<pos_balle[1]<len_space+wall_length+d_t):
         return False
+
+    # 4 murs des goal zones à éviter
+    if (pos_balle[0]<1+d_t) and (terrain_y-goal_zone_left_y-d_t<pos_balle[1]<terrain_y-goal_zone_left_y+d_t):
+        return False
+    if (goal_zone_left_x-dt<pos_balle[0]<goal_zone_left_x+d_t) and (pos_balle[1]<terrain_y-1-d_t):
+        return False
+    if (pos_balle[0]>terrain_x-1-d_t) and (goal_zone_left_y-d_t<pos_balle[1]<goal_zone_left_y+d_t):
+        return False
+    if (terrain_x-goal_zone_left_x-dt<pos_balle[0]<terrain_x-goal_zone_left_x+d_t) and (pos_balle[1]<1+d_t):
+        return False
+
     return True
 
 # def test_choppe_balle(pos_robot,pos_balle):
@@ -330,7 +341,6 @@ class Robot_Control(Node):
         objectif.x, objectif.y, objectif.z = float(self.objective_x),float(self.objective_y),float(self.objective_z)
         if(self.has_objective == False):
             objectif.z = float(2.)
-
         self.publisher_.publish(objectif)
 
 def main(args=None):
