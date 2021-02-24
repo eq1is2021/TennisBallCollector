@@ -81,10 +81,16 @@ Pour démarrer la labelisation des balles:
 ros2 run labelisation_balles labelisation
 ```
 
-Pour démarrer la localisation des arucos :
+Pour démarrer la localisation des arucos (non utilisé) :
 
 ```
 ros2 run localisation_aruco viewer
+```
+
+Pour démarrer la localisation par gnss :
+
+```
+ros2 run robot_control fake_gps
 ```
 
 Pour démarrer la détection des personnes :
