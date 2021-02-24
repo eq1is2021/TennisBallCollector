@@ -60,8 +60,15 @@ def model_objective(p, p_obj):
 
 def model_player(p, p_j):
     N1, N2 = p[0, 0] - p_j[0, 0], p[1, 0] - p_j[1, 0]
-    j_x = 100 * N1 / (N1**2 + N2**2)**(6/2)
-    j_y = 100 * N2 / (N1**2 + N2**2)**(6/2)
+    j_x = 80 * N1 / (N1**2 + N2**2)**(6/2)
+    j_y = 80 * N2 / (N1**2 + N2**2)**(6/2)
+
+    return array([[j_x], [j_y]])
+
+def model_point(p, p_j, coeff):
+    N1, N2 = p[0, 0] - p_j[0, 0], p[1, 0] - p_j[1, 0]
+    j_x = coeff * N1 / (N1**2 + N2**2)**(6/2)
+    j_y = coeff * N2 / (N1**2 + N2**2)**(6/2)
 
     return array([[j_x], [j_y]])
 
@@ -101,6 +108,8 @@ class FieldSubPub(Node):
         self.subscription2 = self.create_subscription(PoseArray,'/joueurs_coords', self.players_callback,10)
         self.subscription3 = self.create_subscription(Twist,'/gnss_twist', self.pos_callback,10)
         self.subscription4 = self.create_subscription(Imu,'/imu/data', self.ang_callback,10)
+
+        self.n = 0
 
     def objective_callback(self, msg):
         self.objective_status = msg.z
@@ -153,9 +162,12 @@ class FieldSubPub(Node):
         Nwall5, Nwall6 = model_wall(p, p5, p6)
         p7, p8 = array([[30], [0]]), array([[30], [16]])
         Nwall7, Nwall8 = model_wall(p, p7, p8)
+
         p9, p10 = array([[15], [2.5]]), array([[15], [13.5]])
         Nwall9, Nwall10 = model_wall(p, p9, p10)
-        p11, p12 = array([[0], [13.5]]), array([[1.], [13.5]])
+        
+        
+        p11, p12 = array([[0], [13.5]]), array([[1], [13.5]])
         Nwall11, Nwall12 = model_wall(p, p11, p12)
         p13, p14 = array([[2.7], [15]]), array([[2.7], [16]])
         Nwall13, Nwall14 = model_wall(p, p13, p14)
@@ -163,12 +175,21 @@ class FieldSubPub(Node):
         Nwall15, Nwall16 = model_wall(p, p15, p16)
         p17, p18 = array([[29], [2.5]]), array([[30], [2.5]])
         Nwall17, Nwall18 = model_wall(p, p17, p18)
+        
+        pp1, pp2 = array([[0], [15]]), array([[30], [0]]) 
+
+        NP1x, NP1y = model_point(p, pp1, 30)
+        NP2x, NP2y = model_point(p, pp2, 30)
+
         # gestion du filet
         net_x_bot, net_y_bot = model_box(p, 13, 17, 1, 8, array([[0], [-1]]))
         net_x_top, net_y_top = model_box(p, 13, 17, 8, 15, array([[0], [1]]))
 
         const_V_x = net_x_bot + net_x_top + Nwall1 + Nwall3 + Nwall5 + Nwall7 + Nwall9 + Nwall11 + Nwall13 + Nwall15 + Nwall17
         const_V_y = net_y_bot + net_y_top + Nwall2 + Nwall4 + Nwall6 + Nwall8 + Nwall10 + Nwall12 + Nwall14 + Nwall16 + Nwall18
+
+        const_V_x += NP1x+NP2x
+        const_V_y += NP1y+NP2y
 
         return array([[const_V_x], [const_V_y]])
 
@@ -206,29 +227,33 @@ class FieldSubPub(Node):
         return VX, VY
 
     def draw_field(self):
-        var = self.array_var_V()
-        self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
-        R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
+        self.n += 1
         plt.cla()
         plt.xlim((-2, 32))
         plt.ylim((-2, 18))
-        plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
-        # robot        
-        plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
-        plt.plot(self.position[0, 0], self.position[1, 0], '.b')
-        plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
-        #objective
-        obj_color = 'g' if self.objective_status !=2 else 'k'
-        current_dir = arctan2(self.current_V[1, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2), self.current_V[0, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2))[0]
-        plt.arrow(self.position[0, 0], self.position[1, 0], cos(current_dir), sin(current_dir), color=obj_color)
-        plt.plot(self.objective[0, 0], self.objective[1, 0], color=obj_color, linestyle='dotted')
-        text = '('+ str(round(self.objective[0, 0], 1)) + '|' + str(round(self.objective[1, 0], 1)) + ')'
-        plt.text(self.objective[0, 0], self.objective[1, 0], text, fontsize=12, color = obj_color)
-        #players
-        plt.plot(self.players[0][0, 0], self.players[0][1, 0], '.r')
-        plt.plot(self.players[1][0, 0], self.players[1][1, 0], '.r')
-        plt.gcf().canvas.draw_idle()
-        plt.gcf().canvas.start_event_loop(0.001)
+
+        if(self.n%4 == 0):
+            var = self.array_var_V()
+            self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
+            R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
+            plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
+
+            # robot        
+            plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
+            plt.plot(self.position[0, 0], self.position[1, 0], '.b')
+            plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
+            #objective
+            obj_color = 'g' if self.objective_status !=2 else 'k'
+            current_dir = arctan2(self.current_V[1, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2), self.current_V[0, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2))[0]
+            plt.arrow(self.position[0, 0], self.position[1, 0], cos(current_dir), sin(current_dir), color=obj_color)
+            plt.plot(self.objective[0, 0], self.objective[1, 0], color=obj_color, linestyle='dotted')
+            text = '('+ str(round(self.objective[0, 0], 1)) + '|' + str(round(self.objective[1, 0], 1)) + ')'
+            plt.text(self.objective[0, 0], self.objective[1, 0], text, fontsize=12, color = obj_color)
+            #players
+            plt.plot(self.players[0][0, 0], self.players[0][1, 0], '.r')
+            plt.plot(self.players[1][0, 0], self.players[1][1, 0], '.r')
+            plt.gcf().canvas.draw_idle()
+            plt.gcf().canvas.start_event_loop(0.001)
 
 def main(args=None):
     plt.ion()
