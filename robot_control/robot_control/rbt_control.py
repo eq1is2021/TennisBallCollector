@@ -249,6 +249,7 @@ class Robot_Control(Node):
         # On initialise une absence d'objectif
         self.has_objective = False
         self.objective_x,self.objective_y,self.objective_z = 0.,0.,0.
+        self.balle_target_id = -1
         # Si le robot a une balle dans son panier
         if self.has_ball:
             print("Has Ball")
