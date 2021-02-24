@@ -32,11 +32,7 @@ class Labeliser(Node):
         #-2 : balle perdue
         #-3 : balle dans le robot 
         #-4 : balle déposée (dans une zone orange)
-        self.array_balles = PoseArray() 
-        for i in range(10):
-            pose = Pose() 
-            pose.position.x, pose.position.y, pose.position.z = 0., 0., 0.
-            self.array_balles.poses.append(pose)   
+        self.array_balles = PoseArray()  
 
         self.publisher_pose  # prevent unused variable warning
         print("Node Labelisation des balles : Noeud lancé")
@@ -69,6 +65,7 @@ class Labeliser(Node):
         cv2.waitKey(1)
 
     def balles_callback(self, msg):
+        """
         if len(msg.poses) > 0:
             if self.count == 0:
                 if len(msg.poses) == 1:
@@ -85,7 +82,7 @@ class Labeliser(Node):
                             dist.append(float("inf"))
 
                     mi = min(dist)
-                    if(mi <100 ):
+                    if(mi < 100 ):
                         index = dist.index(mi)
                         self.array_balles.poses[j].position = msg.poses[index].position
                         self.array_balles.poses[j].position.z = 1.
@@ -103,18 +100,60 @@ class Labeliser(Node):
                     self.count+= 1
 
             self.send_balles() 
+        """
+        #on ajoute une balle pour l'initialisation
+        if(len(msg.poses) > 0 and len(self.array_balles.poses) == 0):
+            pose = Pose() 
+            pose.position = msg.poses[0].position
+            pose.position.z = 2.
+            self.array_balles.poses.append(pose)
+
+        for j in range(len(self.array_balles.poses)):
+            if self.array_balles.poses[j].position.z == 1. :
+                self.array_balles.poses[j].position.z = 2.
+
+        #on parcours toutes les balles vues
+        for i in range(len(msg.poses)):
+            if msg.poses[i].position.z == 0.:
+                dist = []
+                #on parcours la liste des balles vues à l'état précedent pour trouver la plus proche
+                for j in range(len(self.array_balles.poses)):
+                    if self.array_balles.poses[j].position.z == 2. :
+                        dist.append(self.dist(self.array_balles.poses[j], msg.poses[i]))
+                    else:
+                        dist.append(float("inf"))
+                mi = min(dist)
+                if(mi < 100 ):
+                    #une balle est trouvée
+                    index = dist.index(mi)
+                    self.array_balles.poses[index].position = msg.poses[i].position
+                    self.array_balles.poses[index].position.z = 1.
+                else :
+                    #balle pas trouvée, on l'ajoute dans la liste
+                    pose = Pose() 
+                    pose.position.x, pose.position.y, pose.position.z = 0., 0., 0.
+                    self.array_balles.poses.append(pose)
+        self.send_balles() 
 
     def send_balles(self):
         msg = PoseArray() 
         x_offset = 30
         y_offset = 683
         scale = 0.02481389578163772
-        for i in range(10):
+        for i in range(len(self.array_balles.poses)):
             pose = Pose() 
             pose.position.x = (self.array_balles.poses[i].position.x-x_offset)*scale
             pose.position.y = (-self.array_balles.poses[i].position.y+y_offset)*scale
             pose.position.z = self.array_balles.poses[i].position.z
-            msg.poses.append(pose)   
+            msg.poses.append(pose)
+
+
+        while(len(msg.poses) < 10):
+            pose = Pose() 
+            pose.position.x = 0.
+            pose.position.y = 0.
+            pose.position.z = 0.
+            msg.poses.append(pose)
 
         self.publisher_pose.publish(msg) 
 
