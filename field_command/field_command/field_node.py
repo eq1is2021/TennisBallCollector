@@ -60,8 +60,8 @@ def model_objective(p, p_obj):
 
 def model_player(p, p_j):
     N1, N2 = p[0, 0] - p_j[0, 0], p[1, 0] - p_j[1, 0]
-    j_x = 80 * N1 / (N1**2 + N2**2)**(6/2)
-    j_y = 80 * N2 / (N1**2 + N2**2)**(6/2)
+    j_x = 100 * N1 / (N1**2 + N2**2)**(2.5)
+    j_y = 100 * N2 / (N1**2 + N2**2)**(2.5)
 
     return array([[j_x], [j_y]])
 
@@ -138,7 +138,11 @@ class FieldSubPub(Node):
             if self.objective_status in [0, 1]:
                 d = sqrt((self.objective[0, 0] - self.position[0, 0])**2 + (self.objective[1, 0] - self.position[1, 0])**2)
                 if d < 2.:
-                    cmd_msg.linear.x = self.avg_speed * (d/2)**2
+                    if d < 0.2:
+                        cmd_msg.linear.x = 0.
+                        cmd_msg.angular.z = self.angle
+                    else:
+                        cmd_msg.linear.x = self.avg_speed * (d/2)**2
                 else:
                     cmd_msg.linear.x = self.avg_speed
             else:
@@ -233,10 +237,10 @@ class FieldSubPub(Node):
         plt.ylim((-2, 18))
 
         if(self.n%4 == 0):
-            var = self.array_var_V()
-            self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
-            R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
-            plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
+            #var = self.array_var_V()
+            #self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
+            #R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
+            #plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
 
             # robot        
             plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')

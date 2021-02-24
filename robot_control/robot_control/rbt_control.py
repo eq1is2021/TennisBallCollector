@@ -225,12 +225,12 @@ class Robot_Control(Node):
                 # self.get_logger().error(str(self.pos_balle[i]))
                 # print("testing ball: ",i)
                 # Poids de l'id
-                weight_id = ((10-i)/10)*2/3
+                weight_id = ((10-i)/10)*1/3
                 dist_ball=get_dist(self.pos_robot,self.pos_balle[i])
                 # print("dist_ball: ",dist_ball)
                 dist_max=np.linalg.norm([terrain_x, terrain_y])
                 # Poids de la distance
-                weight_dist=((dist_max-dist_ball)/dist_max)*1/3
+                weight_dist=((dist_max-dist_ball)/dist_max)*2/3
                 # Poids total de la balle
                 weight_ball = weight_id+weight_dist
                 # print("weight: ",weight)
