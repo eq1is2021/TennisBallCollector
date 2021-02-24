@@ -81,7 +81,7 @@ Pour démarrer la labelisation des balles:
 ros2 run labelisation_balles labelisation
 ```
 
-Pour démarrer la localisation des arucos (plus utilisé) :
+Pour démarrer la localisation des arucos (non utilisé) :
 
 ```
 ros2 run localisation_aruco viewer
