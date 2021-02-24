@@ -14,9 +14,10 @@ from std_msgs.msg import Bool
 ###Création des variables globales - taille du terrain, taille du mur, zone d'entrée dans les buts et buts eux-mêmes
 terrain_x=30
 terrain_y=16
-wall_center=15
+wall_center_x=terrain_x/2
+wall_center_y=terrain_y/2
 wall_length=11.15
-len_space=terrain_y-wall_center-wall_length/2
+len_space=terrain_y-wall_center_y-wall_length/2
 goal_zone_left_x=2.7
 goal_zone_left_y=terrain_y-2.5
 goal_zone_right_x=terrain_x-2.7
@@ -109,12 +110,12 @@ def test_ball_near(pos_robot,pos_balle,d):
 
 def test_ball_wall(pos_balle):
     #Fonction de test pour voir si une balle est proche du mur. Return True si la balle est loin du mur et on peut la prendre, False si elle est proche du mur
-    d_t=0.2
+    d_t=0.3
     if pos_balle[0]<d_t or pos_balle[0]>terrain_x-d_t:
         return False
     if pos_balle[1]<d_t or pos_balle[1]>terrain_y-d_t:
         return False
-    if (wall_center-d_t<pos_balle[0]<wall_center+d_t) and (len_space-d_t<pos_balle[1]<len_space+wall_length+d_t):
+    if (wall_center_x-d_t<pos_balle[0]<wall_center_x+d_t) and (len_space-d_t<pos_balle[1]<len_space+wall_length+d_t):
         return False
     return True
 
@@ -208,7 +209,7 @@ class Robot_Control(Node):
         for i in range(10):
             # Si la balle existe
             # print(self.pos_balle[i][2])
-            if self.pos_balle[i][2]==1 and test_ball_wall(pos_balle):
+            if self.pos_balle[i][2]==1 and test_ball_wall(self.pos_balle[i]):
                 # print("testing ball: ",i)
                 # Poids de l'id
                 weight_id = ((10-i)/10)*2/3
@@ -225,6 +226,8 @@ class Robot_Control(Node):
                 if weight_ball > weight:
                     weight = weight_ball
                     self.balle_target_id = i
+                    self.get_logger().info("self.balle_target_id: ")
+                    self.get_logger().info(str(self.balle_target_id))
                     print("self.balle_target_id: ",self.balle_target_id)
                 # En sortie de boucle, on a donc l'id de la balle avec le poids le plus élevé
 
