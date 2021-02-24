@@ -83,6 +83,7 @@ class FieldSubPub(Node):
         self.objective_status = 2
         self.players = [array([[5.], [5.]]), array([[25.], [5.]])]
         self.avg_speed = 2.0
+        self.initialized = False
 
         self.cst_V = self.const_V(self.position)
         self.current_V = self.cst_V + self.var_V(self.position)
@@ -93,7 +94,7 @@ class FieldSubPub(Node):
         self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
 
         self.publisher_ = self.create_publisher(Twist, '/cmd_yaw', 10)
-        timer_period = 0.1  # seconds
+        timer_period = 0.05  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         self.subscription1 = self.create_subscription(Point,'/robot_objective', self.objective_callback,10)
@@ -102,8 +103,11 @@ class FieldSubPub(Node):
         self.subscription4 = self.create_subscription(Imu,'/imu/data', self.ang_callback,10)
 
     def objective_callback(self, msg):
-        self.objective [0, 0], self.objective[1, 0] = msg.x, msg.y
         self.objective_status = msg.z
+        if msg.z != 2:
+            if not self.initialized:
+                self.initialized = True
+            self.objective [0, 0], self.objective[1, 0] = msg.x, msg.y
 
     def players_callback(self, msg):
         if msg.poses[0].position.z == 1:
@@ -118,22 +122,28 @@ class FieldSubPub(Node):
         self.angle = sawtooth(quat2euler([msg.orientation.w, msg.orientation.x, msg.orientation.y, msg.orientation.z])[2] - pi/2.)
 
     def timer_callback(self):
-        self.current_V = self.const_V(self.position) + self.var_V(self.position)
-        cmd_msg = Twist()
-        if self.objective_status in [0, 1]:
-            d = sqrt((self.objective[0, 0] - self.position[0, 0])**2 + (self.objective[1, 0] - self.position[1, 0])**2)
-            if d < 1.:
-                cmd_msg.linear.x = self.avg_speed * d**2
-            elif d < 0.3:
-                cmd_msg.linear.x = 0.
-            else:
-                cmd_msg.linear.x = self.avg_speed
+        if self.initialized:
+            self.current_V = self.const_V(self.position) + self.var_V(self.position)
+            cmd_msg = Twist()
             cmd_msg.angular.z = arctan2((float)(self.current_V[1, 0]), (float)(self.current_V[0, 0]))
-        else:
-            cmd_msg.linear.x = self.avg_speed
-            cmd_msg.angular.z = self.angle
-        self.publisher_.publish(cmd_msg)
-        self.draw_field()
+            if self.objective_status in [0, 1]:
+                d = sqrt((self.objective[0, 0] - self.position[0, 0])**2 + (self.objective[1, 0] - self.position[1, 0])**2)
+                if d < 1.:
+                    cmd_msg.linear.x = self.avg_speed * d**2
+                elif d < 0.3:
+                    cmd_msg.linear.x = 0.
+                else:
+                    cmd_msg.linear.x = self.avg_speed
+            else:
+                d1 = sqrt((self.players[0][0, 0] - self.position[0, 0])**2 + (self.players[0][1, 0] - self.position[1, 0])**2)
+                d2 = sqrt((self.players[1][0, 0] - self.position[0, 0])**2 + (self.players[1][1, 0] - self.position[1, 0])**2)
+                if (d1 < 2.) or (d2 < 2.):
+                    cmd_msg.linear.x = self.avg_speed
+                else:
+                    cmd_msg.linear.x = 0.
+
+            self.publisher_.publish(cmd_msg)
+            self.draw_field()
 
     def const_V(self, p):
         #gestion des murs
