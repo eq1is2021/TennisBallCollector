@@ -22,10 +22,10 @@ goal_zone_left_x=2.7
 goal_zone_left_y=terrain_y-2.5
 goal_zone_right_x=terrain_x-2.7
 goal_zone_right_y=2.5
-goal_left_x=1
-goal_left_y=terrain_y-1
-goal_right_x=terrain_x-1
-goal_right_y=1
+goal_left_x=2
+goal_left_y=terrain_y-2
+goal_right_x=terrain_x-2
+goal_right_y=2
 
 #Fonction renvoyant la distance et l'angle entre le robot et une position (en prenant en compte l'angle du robot)
 def get_dist(pos_robot,pos_target):
@@ -264,83 +264,97 @@ class Robot_Control(Node):
             # # Si le robot n'a pas de balle tout près à chercher
             # if not self.has_objective:
             # S'il est à gauche
-            if test_lr(self.pos_robot[0]) == "left":
-                print("Robot - Left")
-                if test_goal(self.pos_robot):
-                    # print("Inside Goal Zone - Stop")
-                    self.objective_x,self.objective_y = 0,0
-                    self.objective_z = 2
-                    self.has_objective = True
-                else:
-                    if test_goal_zone(self.pos_robot) or self.goal_status: # S'il est dans la zone d'entrée du but, ou s'il est en train d'aller vers le but, il va vers le but
-                        # print("Moving Toward Goal")
-                        self.objective_x,self.objective_y = goal_left_x,goal_left_y
-                        self.objective_z = 1
-                        self.goal_status = True
-                        self.has_objective = True
-                    else: #Sinon, il se dirige vers la zone d'entrée de but
-                        # print("Moving Toward Goal Entry Zone")
-                        self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
-                        self.objective_z = 1
-                        self.has_objective = True
+
+            if test_goal(self.pos_robot):
+                # print("Inside Goal Zone - Stop")
+                self.objective_x,self.objective_y = 0,0
+                self.objective_z = 2
+                self.has_objective = True
             else:
-                # print("Robot - Right")
-                if test_goal(self.pos_robot):
-                    # print("Inside Goal Zone")
-                    self.objective_x,self.objective_y = 0,0
-                    self.objective_z = 2
+                if test_lr(self.pos_robot[0]) == "left":
+                    # print("Robot - Left")
+                    self.objective_x,self.objective_y = goal_left_x,goal_left_y
+                    self.objective_z = 1
                     self.has_objective = True
+                    # Partie commentée car déjà gérée par le champ de potentiel
+                    # if test_goal_zone(self.pos_robot) or self.goal_status: # S'il est dans la zone d'entrée du but, ou s'il est en train d'aller vers le but, il va vers le but
+                    #     # print("Moving Toward Goal")
+                    #     self.objective_x,self.objective_y = goal_left_x,goal_left_y
+                    #     self.objective_z = 1
+                    #     self.goal_status = True
+                    #     self.has_objective = True
+                    # else: #Sinon, il se dirige vers la zone d'entrée de but
+                    #     # print("Moving Toward Goal Entry Zone")
+                    #     self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
+                    #     self.objective_z = 1
+                    #     self.has_objective = True
+                    # print("Robot - Right")
                 else:
-                    if test_goal_zone(self.pos_robot) or self.goal_status:
-                        # print("Moving Toward Goal")
-                        self.objective_x,self.objective_y = goal_right_x,goal_right_y
-                        self.objective_z = 1
-                        self.has_objective = True
-                        self.goal_status = True
-                    else:
-                        # print("Moving Toward Goal Entry Zone")
-                        self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
-                        self.objective_z = 1
-                        self.has_objective = True
+                    self.objective_x,self.objective_y = goal_right_x,goal_right_y
+                    self.objective_z = 1
+                    self.has_objective = True
+                    # Partie commentée car déjà gérée par le champ de potentiel
+                    # if test_goal_zone(self.pos_robot) or self.goal_status:
+                    #     # print("Moving Toward Goal")
+                    #     self.objective_x,self.objective_y = goal_right_x,goal_right_y
+                    #     self.objective_z = 1
+                    #     self.has_objective = True
+                    #     self.goal_status = True
+                    # else:
+                    #     # print("Moving Toward Goal Entry Zone")
+                    #     self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
+                    #     self.objective_z = 1
+                    #     self.has_objective = True
+                    
         else:
             # Si le robot n'a pas de balle, il ne doit pas aller vers le but de toute façon.
             self.goal_status = False
             # print("No Ball")
-            if test_goal(self.pos_robot):
-                # print("Inside Goal")
-                if test_lr(self.pos_robot[0]) == "left":
-                    # print("Going Outside - Left")
-                    self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
-                    self.objective_z = 1
+            # Sortie du goal commentée car déjà gérée par le champ de potentiel
+            # if test_goal(self.pos_robot):
+            #     # print("Inside Goal")
+            #     if test_lr(self.pos_robot[0]) == "left":
+            #         # print("Going Outside - Left")
+            #         self.objective_x,self.objective_y = goal_zone_left_x,goal_zone_left_y
+            #         self.objective_z = 1
+            #         self.has_objective = True
+            #     else:
+            #         # print("Going Outside - Right")
+            #         self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
+            #         self.objective_z = 1
+            #         self.has_objective = True
+            # else:
+            if self.num_balle > 0:
+                self.get_ball_target_id()
+                # print("Target Ball: ",self.balle_target_id)
+                if self.balle_target_id >= 0:
+                    #Si on a un objectif
+                    self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id][0],self.pos_balle[self.balle_target_id][1]
+                    self.objective_z = 0
                     self.has_objective = True
-                else:
-                    # print("Going Outside - Right")
-                    self.objective_x,self.objective_y = goal_zone_right_x,goal_zone_right_y
-                    self.objective_z = 1
-                    self.has_objective = True
-            else:
-                if self.num_balle > 0:
-                    self.get_ball_target_id()
-                    # print("Target Ball: ",self.balle_target_id)
-                    if self.balle_target_id >= 0:
-                        # Si le robot et la balle sont du même côté:
-                        # print("self.pos_robot[0]: ",self.pos_robot[0])
-                        # print("self.pos_balle[self.balle_target_id][0]: ",self.pos_balle[self.balle_target_id][0])
-                        if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id][0]):
-                            # self.get_logger().error("Robot and Ball in the same side")
-                            # print("Robot and Ball in the same side")
-                            self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id][0],self.pos_balle[self.balle_target_id][1]
-                            # self.get_logger().error("self.pos_balle[self.balle_target_id]: ")
-                            # self.get_logger().error(str(self.pos_balle[self.balle_target_id]))
-                            self.objective_z = 0
-                            self.has_objective = True
-                            # Le robot va chercher la balle
-                        else:
-                            # Sinon, le robot va vers le passage dans le mur le plus proche
-                            # print("Robot and ball in different sides")
-                            self.objective_x,self.objective_y=get_passage_wall(self.pos_robot)
-                            self.objective_z = 1
-                            self.has_objective = True
+
+                    # ###Partie commentée car devenue redondante avec le champ de potentiel
+
+                    # # Si le robot et la balle sont du même côté:
+                    # # print("self.pos_robot[0]: ",self.pos_robot[0])
+                    # # print("self.pos_balle[self.balle_target_id][0]: ",self.pos_balle[self.balle_target_id][0]
+
+                    # if test_lr(self.pos_robot[0])==test_lr(self.pos_balle[self.balle_target_id][0]):
+                    #     # self.get_logger().error("Robot and Ball in the same side")
+                    #     # print("Robot and Ball in the same side")
+                    #     self.objective_x,self.objective_y=self.pos_balle[self.balle_target_id][0],self.pos_balle[self.balle_target_id][1]
+                    #     # self.get_logger().error("self.pos_balle[self.balle_target_id]: ")
+                    #     # self.get_logger().error(str(self.pos_balle[self.balle_target_id]))
+                    #     self.objective_z = 0
+                    #     self.has_objective = True
+                    #     # Le robot va chercher la balle
+                    # else:
+                    #     # Sinon, le robot va vers le passage dans le mur le plus proche
+                    #     # print("Robot and ball in different sides")
+                    #     self.objective_x,self.objective_y=get_passage_wall(self.pos_robot)
+                    #     self.objective_z = 1
+                    #     self.has_objective = True
+
         # Enfin, on envoie la commande du robot
         # self.commande_robot=command_objective(self.pos_robot,[self.objective_x,self.objective_y])
         objectif = Point()
