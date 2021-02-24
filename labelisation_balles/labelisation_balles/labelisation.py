@@ -150,7 +150,6 @@ class Labeliser(Node):
                 pose.position.z = self.array_balles.poses[i].position.z
                 msg.poses.append(pose)
 
-
         while(len(msg.poses) < 10):
             pose = Pose() 
             pose.position.x = 0.
