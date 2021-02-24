@@ -7,6 +7,7 @@ from numpy import array, cos, sin, arctan2, sqrt, sign, cross, arange, meshgrid,
 from numpy.linalg import norm
 from transforms3d.euler import quat2euler
 import matplotlib.pyplot as plt
+import time
 
 def sawtooth(x):
     return (x + pi) % (2 * pi) - pi
@@ -81,7 +82,7 @@ class FieldSubPub(Node):
         self.objective = array([[0.], [0.]])
         self.objective_status = 2
         self.players = [array([[5.], [5.]]), array([[25.], [5.]])]
-        self.avg_speed = 0.5
+        self.avg_speed = 1.0
 
         self.cst_V = self.const_V(self.position)
         self.current_V = self.cst_V + self.var_V(self.position)
@@ -190,21 +191,28 @@ class FieldSubPub(Node):
         return VX, VY
 
     def draw_field(self):
-        var = self.array_var_V()
-        self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
-        R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
+        #var = self.array_var_V()
+        #self.current_V_array = [self.cst_V_array[0] + var[0], self.cst_V_array[1] + var[1]]
+        #R = sqrt(self.current_V_array[0] ** 2 + self.current_V_array[1] ** 2)
         plt.cla()
         plt.xlim((-2, 32))
         plt.ylim((-2, 18))
-        plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
+        #plt.quiver(self.Mx, self.My, self.current_V_array[0] / R, self.current_V_array[1] / R)
+        #print("hello")
+        #current_dir = arctan2(self.current_V[1, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2), self.current_V[0, 0] / sqrt(self.current_V[1, 0] ** 2 + self.current_V[0, 0] ** 2))
+        #print(current_dir)
+        #plt.arrow(self.position[0, 0], self.position[1, 0], cos(current_dir), sin(current_dir), color='g')
+        plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
         plt.plot(self.position[0, 0], self.position[1, 0], '.b')
         plt.arrow(self.position[0, 0], self.position[1, 0], cos(self.angle), sin(self.angle), color='b')
         plt.plot(self.objective[0, 0], self.objective[1, 0], '.g')
         plt.plot(self.players[0][0, 0], self.players[0][1, 0], '.r')
         plt.plot(self.players[1][0, 0], self.players[1][1, 0], '.r')
-        plt.pause(0.001)
+        plt.gcf().canvas.draw_idle()
+        plt.gcf().canvas.start_event_loop(0.001)
 
 def main(args=None):
+    plt.ion()
     plt.figure()
     plt.xlim((-2, 32))
     plt.ylim((-2, 18))
