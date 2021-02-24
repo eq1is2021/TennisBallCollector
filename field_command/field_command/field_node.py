@@ -128,10 +128,8 @@ class FieldSubPub(Node):
             cmd_msg.angular.z = arctan2((float)(self.current_V[1, 0]), (float)(self.current_V[0, 0]))
             if self.objective_status in [0, 1]:
                 d = sqrt((self.objective[0, 0] - self.position[0, 0])**2 + (self.objective[1, 0] - self.position[1, 0])**2)
-                if d < 1.:
-                    cmd_msg.linear.x = self.avg_speed * d**2
-                elif d < 0.3:
-                    cmd_msg.linear.x = 0.
+                if d < 2.:
+                    cmd_msg.linear.x = self.avg_speed * (d/2)**2
                 else:
                     cmd_msg.linear.x = self.avg_speed
             else:
