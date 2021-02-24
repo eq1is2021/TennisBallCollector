@@ -69,39 +69,40 @@ class Labeliser(Node):
         cv2.waitKey(1)
 
     def balles_callback(self, msg):
-        if self.count == 0:
-            if len(msg.poses) == 1:
-                self.array_balles.poses[0] = msg.poses[0]
-                self.array_balles.poses[0].position.z = 1.
-                self.count +=1
-        else:
-            for j in range(self.count):
-                dist = []
-                for i in range(len(msg.poses)):
-                    if msg.poses[i].position.z == 0.:
-                        dist.append(self.dist(self.array_balles.poses[j], msg.poses[i]))
+        if len(msg.poses) > 0:
+            if self.count == 0:
+                if len(msg.poses) == 1:
+                    self.array_balles.poses[0] = msg.poses[0]
+                    self.array_balles.poses[0].position.z = 1.
+                    self.count +=1
+            else:
+                for j in range(self.count):
+                    dist = []
+                    for i in range(len(msg.poses)):
+                        if msg.poses[i].position.z == 0.:
+                            dist.append(self.dist(self.array_balles.poses[j], msg.poses[i]))
+                        else:
+                            dist.append(float("inf"))
+
+                    mi = min(dist)
+                    if(mi <100 ):
+                        index = dist.index(mi)
+                        self.array_balles.poses[j].position = msg.poses[index].position
+                        self.array_balles.poses[j].position.z = 1.
+                        msg.poses[index].position.z = 1.
                     else:
-                        dist.append(float("inf"))
-
-                mi = min(dist)
-                if(mi <100 ):
-                    index = dist.index(mi)
-                    self.array_balles.poses[j].position = msg.poses[index].position
-                    self.array_balles.poses[j].position.z = 1.
-                    msg.poses[index].position.z = 1.
-                else:
-                    #balle perdue
-                    self.array_balles.poses[j].position.z = 2.
+                        #balle perdue
+                        self.array_balles.poses[j].position.z = 2.
 
 
-            if len(msg.poses) > self.count:
-                for i in range(len(msg.poses)):
-                    if msg.poses[i].position.z == 0.:
-                        self.array_balles.poses[self.count] = msg.poses[i]
-                        self.array_balles.poses[self.count].position.z = 1.
-                self.count+= 1
+                if len(msg.poses) > self.count:
+                    for i in range(len(msg.poses)):
+                        if msg.poses[i].position.z == 0.:
+                            self.array_balles.poses[self.count] = msg.poses[i]
+                            self.array_balles.poses[self.count].position.z = 1.
+                    self.count+= 1
 
-        self.send_balles() 
+            self.send_balles() 
 
     def send_balles(self):
         msg = PoseArray() 
