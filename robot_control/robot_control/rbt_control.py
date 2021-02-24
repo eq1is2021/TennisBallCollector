@@ -110,10 +110,10 @@ def test_ball_near(pos_robot,pos_balle,d):
 
 def test_ball_wall(pos_balle):
     #Fonction de test pour voir si une balle est proche du mur. Return True si la balle est loin du mur et on peut la prendre, False si elle est proche du mur
-    d_t=0.3
-    if pos_balle[0]<d_t or pos_balle[0]>terrain_x-d_t:
+    d_t=1
+    if (pos_balle[0]<d_t) or (pos_balle[0]>terrain_x-d_t):
         return False
-    if pos_balle[1]<d_t or pos_balle[1]>terrain_y-d_t:
+    if (pos_balle[1]<d_t) or (pos_balle[1]>terrain_y-d_t):
         return False
     if (wall_center_x-d_t<pos_balle[0]<wall_center_x+d_t) and (len_space-d_t<pos_balle[1]<len_space+wall_length+d_t):
         return False
@@ -121,11 +121,11 @@ def test_ball_wall(pos_balle):
     # 4 murs des goal zones à éviter
     if (pos_balle[0]<1+d_t) and (terrain_y-goal_zone_left_y-d_t<pos_balle[1]<terrain_y-goal_zone_left_y+d_t):
         return False
-    if (goal_zone_left_x-dt<pos_balle[0]<goal_zone_left_x+d_t) and (pos_balle[1]<terrain_y-1-d_t):
+    if (goal_zone_left_x-d_t<pos_balle[0]<goal_zone_left_x+d_t) and (pos_balle[1]<terrain_y-1-d_t):
         return False
     if (pos_balle[0]>terrain_x-1-d_t) and (goal_zone_left_y-d_t<pos_balle[1]<goal_zone_left_y+d_t):
         return False
-    if (terrain_x-goal_zone_left_x-dt<pos_balle[0]<terrain_x-goal_zone_left_x+d_t) and (pos_balle[1]<1+d_t):
+    if (terrain_x-goal_zone_left_x-d_t<pos_balle[0]<terrain_x-goal_zone_left_x+d_t) and (pos_balle[1]<1+d_t):
         return False
 
     return True
@@ -162,7 +162,7 @@ class Robot_Control(Node):
 
         self.subscription = self.create_subscription(
             Twist,
-            'aruco_twist',
+            'gnss_twist',
             self.robot_position_callback,
             10)
 
@@ -221,6 +221,8 @@ class Robot_Control(Node):
             # Si la balle existe
             # print(self.pos_balle[i][2])
             if self.pos_balle[i][2]==1 and test_ball_wall(self.pos_balle[i]):
+                self.get_logger().error("self.pos_balle[i]: ")
+                self.get_logger().error(str(self.pos_balle[i]))
                 # print("testing ball: ",i)
                 # Poids de l'id
                 weight_id = ((10-i)/10)*2/3
@@ -237,8 +239,8 @@ class Robot_Control(Node):
                 if weight_ball > weight:
                     weight = weight_ball
                     self.balle_target_id = i
-                    self.get_logger().info("self.balle_target_id: ")
-                    self.get_logger().info(str(self.balle_target_id))
+                    self.get_logger().error("self.balle_target_id: ")
+                    self.get_logger().error(str(self.balle_target_id))
                     print("self.balle_target_id: ",self.balle_target_id)
                 # En sortie de boucle, on a donc l'id de la balle avec le poids le plus élevé
 
