@@ -28,9 +28,9 @@ def generate_launch_description():
     localisation_gps_node = Node(package="robot_control", executable="fake_gps")
     detection_joueurs_node = Node(package="detection_joueurs", executable="detection_joueurs")
     detection_balles_cage_node = Node(package="detection_balles_cage", executable="detection_balles_cage")
-    yaw_ctrl_node = Node(package="yaw_ctrl", node_executable="yaw_ctrl")
-    fake_imu_node = Node(package="yaw_ctrl", node_executable="fake_imu")
-    potential_field_node = Node(package="field_command", node_executable="field_command")
+    yaw_ctrl_node = Node(package="yaw_ctrl", executable="yaw_ctrl")
+    fake_imu_node = Node(package="yaw_ctrl", executable="fake_imu")
+    potential_field_node = Node(package="field_command", executable="field_command")
     robot_control_node = Node(package="robot_control", executable="rbt_control")
 
 
