@@ -135,7 +135,7 @@ class FieldSubPub(Node):
             else:
                 d1 = sqrt((self.players[0][0, 0] - self.position[0, 0])**2 + (self.players[0][1, 0] - self.position[1, 0])**2)
                 d2 = sqrt((self.players[1][0, 0] - self.position[0, 0])**2 + (self.players[1][1, 0] - self.position[1, 0])**2)
-                if (d1 < 2.) or (d2 < 2.):
+                if (d1 < 1.5) or (d2 < 1.5):
                     cmd_msg.linear.x = self.avg_speed
                 else:
                     cmd_msg.linear.x = 0.
